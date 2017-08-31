@@ -145,9 +145,9 @@
         <asm.springsource.version>1.5.3</asm.springsource.version>
         <cglib.bundle.version>3.2.4_1</cglib.bundle.version>
         <cglib2.version>2.2.0</cglib2.version>
-        
+
         <jna.version>4.4.0</jna.version>
-        
+
         <commons-beanutils.version>1.9.2</commons-beanutils.version>
         <commons-codec.version>1.10</commons-codec.version>
         <commons-compress.version>1.14</commons-compress.version>
@@ -184,7 +184,7 @@
         <felix.configadmin.version>1.8.14</felix.configadmin.version>
         <felix.connect.version>0.1.0</felix.connect.version>
         <felix.coordinator.version>1.0.2</felix.coordinator.version>
-        <felix.fileinstall.version>3.6.0</felix.fileinstall.version>
+        <felix.fileinstall.version>3.5.8</felix.fileinstall.version>
         <felix.framework.version>5.6.6</felix.framework.version>
         <felix.framework.security.version>2.6.0</felix.framework.security.version>
         <felix.gogo.runtime.version>1.0.6</felix.gogo.runtime.version>
@@ -1579,7 +1579,7 @@
                 <artifactId>org.apache.aries.subsystem.api</artifactId>
                 <version>${aries.subsystem.api.version}</version>
             </dependency>
-     
+
             <dependency>
                 <groupId>org.apache.aries.subsystem</groupId>
                 <artifactId>org.apache.aries.subsystem.core</artifactId>
@@ -2295,7 +2295,7 @@
             <id>java9</id>
             <properties>
                 <surefire.argLine>--add-opens java.base/java.security=ALL-UNNAMED
-                                  --add-opens java.base/java.net=ALL-UNNAMED 
+                                  --add-opens java.base/java.net=ALL-UNNAMED
                                   --add-opens java.base/java.lang=ALL-UNNAMED
                                   --add-opens java.base/java.util=ALL-UNNAMED
                                   --add-modules java.activation,java.xml.ws.annotation,java.corba,java.transaction,java.xml.bind,java.xml.ws</surefire.argLine>
