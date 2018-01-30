@@ -37,9 +37,11 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -99,6 +101,8 @@ import org.osgi.service.resolver.Resolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.apache.karaf.features.internal.model.Feature.DEFAULT_VERSION;
+import static org.apache.karaf.features.internal.model.Feature.VERSION_SEPARATOR;
 import static org.apache.karaf.features.internal.service.StateStorage.toStringStringSetMap;
 import static org.apache.karaf.features.internal.util.MapUtils.add;
 import static org.apache.karaf.features.internal.util.MapUtils.addToMapSet;
@@ -190,6 +194,9 @@ public class FeaturesServiceImpl implements FeaturesService, Deployer.DeployCall
     private final ExecutorService executor;
     private Map<String, Map<String, Feature>> featureCache;
 
+    private Map<Thread, ResolverHook> hooks = new ConcurrentHashMap<>();
+    private ServiceRegistration<ResolverHookFactory> hookRegistration;
+
     public FeaturesServiceImpl(Bundle bundle,
                                BundleContext bundleContext,
                                BundleContext systemBundleContext,
@@ -257,12 +264,25 @@ public class FeaturesServiceImpl implements FeaturesService, Deployer.DeployCall
         this.blacklisted = blacklisted;
         this.configCfgStore = configCfgStore;
         this.executor = Executors.newSingleThreadExecutor(ThreadUtils.namedThreadFactory("features"));
+
+        if (systemBundleContext != null) {
+            hookRegistration = systemBundleContext.registerService(ResolverHookFactory.class, new ResolverHookFactory() {
+                @Override
+                public ResolverHook begin(Collection<BundleRevision> triggers) {
+                    return hooks.get(Thread.currentThread());
+                }
+            }, null);
+        }
+
         loadState();
         checkResolve();
     }
 
     public void stop() {
-      this.executor.shutdown();
+        this.executor.shutdown();
+        if (hookRegistration != null) {
+            hookRegistration.unregister();
+        }
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -747,9 +767,9 @@ public class FeaturesServiceImpl implements FeaturesService, Deployer.DeployCall
         // Two phase load:
         // * first load dependent repositories
         Set<String> loaded = new HashSet<>();
-        List<String> toLoad = new ArrayList<>(uris);
+        Queue<String> toLoad = new ArrayDeque<>(uris);
         while (!toLoad.isEmpty()) {
-            String uri = toLoad.remove(0);
+            String uri = toLoad.remove();
             Repository repo;
             synchronized (lock) {
                 repo = repositoryCache.get(uri);
@@ -779,13 +799,8 @@ public class FeaturesServiceImpl implements FeaturesService, Deployer.DeployCall
         // * then load all features
         for (Repository repo : repos) {
             for (Feature f : repo.getFeatures()) {
-                if (map.get(f.getName()) == null) {
-                    Map<String, Feature> versionMap = new HashMap<>();
-                    versionMap.put(f.getVersion(), f);
-                    map.put(f.getName(), versionMap);
-                } else {
-                    map.get(f.getName()).put(f.getVersion(), f);
-                }
+                Map<String, Feature> versionMap = map.computeIfAbsent(f.getName(), key -> new HashMap<>());
+                versionMap.put(f.getVersion(), f);
             }
         }
         synchronized (lock) {
@@ -1100,10 +1115,10 @@ public class FeaturesServiceImpl implements FeaturesService, Deployer.DeployCall
     }
 
     protected String normalize(String feature) {
-        if (!feature.contains("/")) {
-            feature += "/0.0.0";
+        int idx = feature.indexOf(VERSION_SEPARATOR);
+        if (idx < 0) {
+            return feature + VERSION_SEPARATOR + DEFAULT_VERSION;
         }
-        int idx = feature.indexOf("/");
         String name = feature.substring(0, idx);
         String version = feature.substring(idx + 1);
         return name + "/" + VersionCleaner.clean(version);
@@ -1384,10 +1399,16 @@ public class FeaturesServiceImpl implements FeaturesService, Deployer.DeployCall
                     }
                     Bundle sourceBundle = requirement.getRevision().getBundle();
                     Resource sourceResource = bndToRes.get(sourceBundle);
+                    List<Wire> wires = wiring.get(sourceResource);
+                    if (sourceBundle == null || wires == null) {
+                        // This could be a bundle external to this resolution which
+                        // is being resolve at the same time, so do not interfere
+                        return;
+                    }
                     Set<Resource> wired = new HashSet<>();
                     // Get a list of allowed wired resources
                     wired.add(sourceResource);
-                    for (Wire wire : wiring.get(sourceResource)) {
+                    for (Wire wire : wires) {
                         wired.add(wire.getProvider());
                         if (HostNamespace.HOST_NAMESPACE.equals(wire.getRequirement().getNamespace())) {
                             for (Wire hostWire : wiring.get(wire.getProvider())) {
@@ -1413,18 +1434,13 @@ public class FeaturesServiceImpl implements FeaturesService, Deployer.DeployCall
             public void end() {
             }
         };
-        ResolverHookFactory factory = new ResolverHookFactory() {
-            @Override
-            public ResolverHook begin(Collection<BundleRevision> triggers) {
-                return hook;
-            }
-        };
-        ServiceRegistration<ResolverHookFactory> registration = systemBundleContext.registerService(ResolverHookFactory.class, factory, null);
+
+        hooks.put(thread, hook);
         try {
             FrameworkWiring frameworkWiring = systemBundleContext.getBundle().adapt(FrameworkWiring.class);
             frameworkWiring.resolveBundles(bundles);
         } finally {
-            registration.unregister();
+            hooks.remove(thread);
         }
     }
 
@@ -1460,6 +1476,9 @@ public class FeaturesServiceImpl implements FeaturesService, Deployer.DeployCall
                 region1.connectRegion(region2, rfb.build());
             }
         }
+        // Verify that no other bundles have been installed externally in the mean time
+        DigraphHelper.verifyUnmanagedBundles(systemBundleContext, temp);
+        // Do replace
         digraph.replace(temp);
     }
 

@@ -101,15 +101,15 @@ public class PropertiesLoader {
      * @throws IOException if the system file can't be loaded.
      */
     public static void loadSystemProperties(File file) throws IOException {
-        Properties props = new Properties(false);
+        Properties props = null;
         try {
-            InputStream is = new FileInputStream(file);
-            props.load(is);
-            is.close();
-        } catch (Exception e1) {
-            // Ignore
+        	URL configPropURL = file.toURI().toURL();
+        	props = loadPropertiesFile(configPropURL, true);
+        } catch (Exception ex) {
+        	// Ignore
+        	return;
         }
-
+        
         for (Enumeration<?> e = props.propertyNames(); e.hasMoreElements();) {
             String name = (String) e.nextElement();
             if (name.startsWith(OVERRIDE_PREFIX)) {
@@ -154,8 +154,6 @@ public class PropertiesLoader {
         } catch (FileNotFoundException ex) {
             if (failIfNotFound) {
                 throw ex;
-            } else {
-                System.err.println("WARN: " + configPropURL + " is not found, so not loaded");
             }
         } catch (Exception ex) {
             System.err.println("Error loading config properties from " + configPropURL);
