@@ -80,7 +80,7 @@
         <module>subsystem</module>
         <module>profile</module>
         <module>event</module>
-        <!-- <module>tooling</module>  -->
+        <module>tooling</module>
         <module>assemblies</module>
         <module>demos</module>
         <module>archetypes</module>
