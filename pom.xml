@@ -35,6 +35,17 @@
     <name>Apache Karaf</name>
     <inceptionYear>2007</inceptionYear>
 
+    <distributionManagement>
+        <repository>
+            <id>release</id>
+            <url>http://repo.seeburger.de/archiva/repository/release/</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshot}</id>
+            <url>http://repo.seeburger.de/archiva/repository/snapshot/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <modules>
         <module>util</module>
         <module>main</module>
@@ -76,14 +87,13 @@
         <module>assemblies</module>
         <module>demos</module>
         <module>archetypes</module>
-        <module>itests</module>
+        <!-- <module>itests</module> -->
     </modules>
 
     <scm>
-        <connection>scm:git:https://gitbox.apache.org/repos/asf/karaf.git</connection>
-        <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/karaf.git</developerConnection>
-        <url>https://gitbox.apache.org/repos/asf?p=karaf.git;a=summary</url>
-      <tag>karaf-4.2.0</tag>
+        <connection>scm:git:git@github.com:seeburger-ag/karaf.git</connection>
+        <developerConnection>scm:git:git@github.com:seeburger-ag/karaf.git</developerConnection>
+      <tag>HEAD</tag>
   </scm>
 
     <issueManagement>
@@ -2229,9 +2239,9 @@
         </profile>
         <profile>
             <id>release</id>
-            <modules>
+<!--             <modules>
                 <module>manual</module>
-            </modules>
+            </modules> -->
             <build>
                 <plugins>
                     <!-- We want to deploy the artifact to a staging location for perusal -->
@@ -2255,6 +2265,9 @@
                                 <goals>
                                     <goal>sign</goal>
                                 </goals>
+                                <configuration>
+                                    <skip>true</skip>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
