@@ -155,14 +155,8 @@
         <asm.springsource.version>1.5.3</asm.springsource.version>
         <cglib.bundle.version>3.2.4_1</cglib.bundle.version>
         <cglib2.version>2.2.0</cglib2.version>
-<<<<<<< HEAD
 
-        <jna.version>4.4.0</jna.version>
-
-=======
-        
         <jna.version>4.5.0</jna.version>
->>>>>>> refs/remotes/upstream/karaf-4.1.x
         <commons-beanutils.version>1.9.2</commons-beanutils.version>
         <commons-codec.version>1.10</commons-codec.version>
         <commons-compress.version>1.15</commons-compress.version>
