@@ -15,6 +15,97 @@
  * limitations under the License.
  */
 
+		    Apache Karaf 4.1.5
+		    ==================
+ Apache Karaf 4.1.5 is a maintenance release on the 4.1.x series, bringing bug fixes, updates and some improvements.
+
+ ChangeLog:
+ ----------
+** Bug
+    * [KARAF-4662] - Unable to create Karaf Cave 4.0.0 Kar file
+    * [KARAF-5210] - Seemingly random NPEs from Aether resolver
+    * [KARAF-5333] -  UnsupportedCharsetException: cp65001 and unprintable characters from karaf 4.1.2 console
+    * [KARAF-5473] - Karaf SSH session timing out
+    * [KARAF-5542] - Installing a feature triggers restarting previous ones
+    * [KARAF-5546] - incorrect acl rules for system:start-level
+    * [KARAF-5559] - log:tail kills ssh & karaf when root logger is in DEBUG
+    * [KARAF-5566] - Features installed through prerequisites lead to errors when uninstalling features
+    * [KARAF-5569] - Cannot pass commands to client script when sftpEnabled=false
+    * [KARAF-5572] - The parent pom of the karaf manual module in 4.1.x still points to 4.1.3-SNAPSHOT
+    * [KARAF-5573] - Karaf on Windows does not pass the version check when JAVA_HOME contains whitespace
+    * [KARAF-5585] - Verify mojo configure pax-url-mvn with non existent settings.xml
+
+** Improvement
+    * [KARAF-4496] - UserPrincipal lookup in the JAAS' BackingEngine
+    * [KARAF-5511] - Proper Provide-Capability for org.apache.karaf.jaas.modules.EncryptionService
+    * [KARAF-5558] - Be able to configure the Quartz Scheduler
+    * [KARAF-5568] - Karaf Commands cannot have return codes
+    * [KARAF-5588] - Increase max number of threads in the scheduler by default
+    * [KARAF-5604] - karaf:features-generate-descriptor takes long when faced with complex feature dependencies
+
+** Dependency upgrade
+    * [KARAF-5550] - Upgrade to pax-url 2.5.4
+    * [KARAF-5595] - Upgrade toJLine 3.6.0 and Jansi 1.17
+    * [KARAF-5597] - Upgrade to Spring 4.3.14.RELEASE
+    * [KARAF-5605] - Upgrade to OpenJPA 2.4.2
+    * [KARAF-5606] - Upgrade to EclipseLink 2.7.1
+    * [KARAF-5607] - Upgrade to Hibernate 5.2.9.Final
+
+		    Apache Karaf 4.1.4
+		    ==================
+ Apache Karaf 4.1.4 is a maintenance release on the 4.1.x series, bringing bug fixes, updates and some improvements.
+
+ ChangeLog:
+ ----------
+** Bug
+    * [KARAF-3875] - Karaf scheduler should wrap QuartzException in exported SchedulerException
+    * [KARAF-3976] - Broken compatibility with 3.x jdbc DataSources
+    * [KARAF-4756] - Redeploying Features in the Deploy directory with install="auto" does not work for same feature versions
+    * [KARAF-5203] - KAR:Create missing bundles that are marked conditional
+    * [KARAF-5296] - The command "shell:watch" fails with a NPE
+    * [KARAF-5446] - Fragment bundles are not resolved properly when installing/restarting the container
+    * [KARAF-5464] - karaf.bat file is missing KARAF_SYSTEM_OPTS property
+    * [KARAF-5471] - Jetty version in Karaf and Pax Web are not aligned
+    * [KARAF-5487] - SshRole restriction not enforced when using username/password
+    * [KARAF-5493] - InvalidPathException is thrown when execute config:property-set command from ssh client
+    * [KARAF-5495] - Upgrade SyncopeBackingEngineFactory to support Syncope 2.x
+    * [KARAF-5496] - NPEs in SyncopeLoginModule if "version" is not specified
+    * [KARAF-5497] - Karaf shuts down when installing CXF feature
+    * [KARAF-5498] - SyncopeLoginModule parses roles instead of groups for Syncope 2.0.x
+    * [KARAF-5527] - the karaf.secured.command.compulsory.roles should only affect command ACL rules
+    * [KARAF-5528] - Karaf feature deployer should stop refreshed bundles together with the updated ones
+    * [KARAF-5533] - KarArtifactInstaller does not properly detect already installed KAR files
+
+** Dependency upgrade
+    * [KARAF-5488] - Upgrade to Felix Framework 5.6.10
+    * [KARAF-5489] - Upgrade to commons-io 2.6
+    * [KARAF-5490] - Upgrade to JNA 4.5.0
+    * [KARAF-5491] - Upgrade to commons-compress 1.15
+    * [KARAF-5517] - Upgrade to Apache Felix Metatype 1.1.6
+    * [KARAF-5518] - Upgrade to Apache Felix WebConsole DS plugin 2.0.8
+    * [KARAF-5519] - Upgrade to Apache Felix WebConsole EventAdmin plugin 1.1.8
+    * [KARAF-5522] - Upgrade to easymock 3.5.1
+    * [KARAF-5523] - Upgrade to Equinox 3.12.50
+    * [KARAF-5525] - Upgrade to PAX tinybundle 3.0.0 
+    * [KARAF-5531] - Upgrade to maven-compiler-plugin 3.7.0
+    * [KARAF-5532] - Upgrade to maven-dependency-plugin 3.0.2
+    * [KARAF-5534] - Upgrade to Pax Web 6.0.9
+    * [KARAF-5535] - Upgrade to maven-javadoc-plugin 3.0.0
+    * [KARAF-5536] - Upgrade to maven-war-plugin 3.2.0
+    * [KARAF-5537] - Upgrade to modello-maven-plugin 1.9.1
+    * [KARAF-5538] - Upgrade to maven-invoker-plugin 3.0.1
+    * [KARAF-5539] - Upgrade to maven-archetype-plugin 3.0.1
+
+** Improvement
+    * [KARAF-5418] - SSH public key authentication from LDAP
+    * [KARAF-5486] - Add a command to change job scheduling
+
+** New Feature
+    * [KARAF-4188] - Add support for Systemd's watchdog
+    * [KARAF-5307] - Add SchedulerMBean to mimic scheduler shell commands
+    * [KARAF-5485] - Be able to disable the sftp server
+
+
 		    Apache Karaf 4.1.3
 		    ==================
  Apache Karaf 4.1.0 is a maintenance release on the 4.1.x series, bringing bug fixes and updates.

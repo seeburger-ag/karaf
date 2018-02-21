@@ -31,7 +31,7 @@
     <groupId>org.apache.karaf</groupId>
     <artifactId>karaf</artifactId>
     <packaging>pom</packaging>
-    <version>4.1.3.SEE2-SNAPSHOT</version>
+    <version>4.1.5.SEE1-SNAPSHOT</version>
     <name>Apache Karaf</name>
     <inceptionYear>2007</inceptionYear>
 
@@ -155,22 +155,27 @@
         <asm.springsource.version>1.5.3</asm.springsource.version>
         <cglib.bundle.version>3.2.4_1</cglib.bundle.version>
         <cglib2.version>2.2.0</cglib2.version>
+<<<<<<< HEAD
 
         <jna.version>4.4.0</jna.version>
 
+=======
+        
+        <jna.version>4.5.0</jna.version>
+>>>>>>> refs/remotes/upstream/karaf-4.1.x
         <commons-beanutils.version>1.9.2</commons-beanutils.version>
         <commons-codec.version>1.10</commons-codec.version>
-        <commons-compress.version>1.14</commons-compress.version>
+        <commons-compress.version>1.15</commons-compress.version>
         <commons-collections.version>3.2.2</commons-collections.version>
         <commons-dbcp.version>1.4_3</commons-dbcp.version>
         <commons-fileupload.version>1.3.1</commons-fileupload.version>
         <commons-jexl.version>2.1.1</commons-jexl.version>
         <commons-lang.version>2.6</commons-lang.version>
         <commons-pool.version>1.6</commons-pool.version>
-        <commons-io.version>2.4</commons-io.version>
+        <commons-io.version>2.6</commons-io.version>
 
         <dom4j.bundle.version>1.6.1_5</dom4j.bundle.version>
-        <eclipselink.version>2.6.4</eclipselink.version>
+        <eclipselink.version>2.7.1</eclipselink.version>
         <jasypt.bundle.version>1.9.2_1</jasypt.bundle.version>
         <jolokia.version>1.3.5</jolokia.version>
         <serp.bundle.version>1.14.1_1</serp.bundle.version>
@@ -182,10 +187,10 @@
         <geronimo.jpa-spec.version>1.1</geronimo.jpa-spec.version>
         <geronimo.jta-spec.version>1.1.1</geronimo.jta-spec.version>
 
-        <easymock.version>3.4</easymock.version>
+        <easymock.version>3.5.1</easymock.version>
         <equinox.groupId>org.eclipse.platform</equinox.groupId>
         <equinox.artifactId>org.eclipse.osgi</equinox.artifactId>
-        <equinox.version>3.11.3</equinox.version>
+        <equinox.version>3.12.50</equinox.version>
         <bndlib.version>2.4.0</bndlib.version>
         <equinox.region.version>1.2.101.v20150831-1342</equinox.region.version>
         <equinox.coordinator.version>1.1.0.v20120522-1841</equinox.coordinator.version>
@@ -194,8 +199,8 @@
         <felix.configadmin.version>1.8.14</felix.configadmin.version>
         <felix.connect.version>0.1.0</felix.connect.version>
         <felix.coordinator.version>1.0.2</felix.coordinator.version>
-        <felix.fileinstall.version>3.5.8</felix.fileinstall.version>
-        <felix.framework.version>5.6.8</felix.framework.version>
+        <felix.fileinstall.version>3.6.4</felix.fileinstall.version>
+        <felix.framework.version>5.6.10</felix.framework.version>
         <felix.framework.security.version>2.6.0</felix.framework.security.version>
         <felix.gogo.runtime.version>1.0.6</felix.gogo.runtime.version>
         <felix.gogo.jline.version>1.0.6</felix.gogo.jline.version>
@@ -205,13 +210,13 @@
         <felix.utils.version>1.10.0</felix.utils.version>
         <felix.webconsole.version>4.3.4</felix.webconsole.version>
         <felix.webconsole.api.version>3.1.2</felix.webconsole.api.version>
-        <felix.metatype.version>1.1.4</felix.metatype.version>
+        <felix.metatype.version>1.1.6</felix.metatype.version>
         <felix.eventadmin.version>1.4.10</felix.eventadmin.version>
-        <felix.eventadmin.webconsole.plugin.version>1.1.6</felix.eventadmin.webconsole.plugin.version>
+        <felix.eventadmin.webconsole.plugin.version>1.1.8</felix.eventadmin.webconsole.plugin.version>
         <felix.obr.version>1.0.2</felix.obr.version>
-        <felix.scr.version>2.0.12</felix.scr.version>
+        <felix.scr.version>2.0.14</felix.scr.version>
         <felix.scr.compat.version>1.0.4</felix.scr.compat.version>
-        <felix.scr.webconsole.plugin.version>2.0.6</felix.scr.webconsole.plugin.version>
+        <felix.scr.webconsole.plugin.version>2.0.8</felix.scr.webconsole.plugin.version>
         <felix.scr.annotation.version>1.12.0</felix.scr.annotation.version>
         <felix.resolver.version>1.14.0</felix.resolver.version>
 
@@ -255,11 +260,11 @@
         <hibernate3.version>3.3.2.GA</hibernate3.version>
         <hibernate42.version>4.2.15.Final</hibernate42.version>
         <hibernate43.version>4.3.6.Final</hibernate43.version>
-        <hibernate.version>5.2.8.Final</hibernate.version>
+        <hibernate.version>5.2.9.Final</hibernate.version>
         <hibernate.validator.version>5.3.4.Final</hibernate.validator.version>
-        <jansi.version>1.16</jansi.version>
+        <jansi.version>1.17</jansi.version>
         <javassist.version>3.9.0.GA</javassist.version>
-        <jline.version>3.5.0</jline.version>
+        <jline.version>3.6.1</jline.version>
         <jsw.version>3.2.3</jsw.version>
         <log4j.version>1.2.17</log4j.version>
         <maven.version>2.0.9</maven.version>
@@ -272,9 +277,9 @@
         <pax.exam.version>4.11.0</pax.exam.version>
         <pax.logging.version>1.10.1</pax.logging.version>
         <pax.base.version>1.5.0</pax.base.version>
-        <pax.url.version>2.5.3</pax.url.version>
-        <pax.web.version>6.0.7</pax.web.version>
-        <pax.tinybundle.version>2.1.1</pax.tinybundle.version>
+        <pax.url.version>2.5.4</pax.url.version>
+        <pax.web.version>6.0.9</pax.web.version>
+        <pax.tinybundle.version>3.0.0</pax.tinybundle.version>
         <pax.jdbc.version>1.1.0</pax.jdbc.version>
 
         <portlet-api.version>2.0</portlet-api.version>
@@ -287,8 +292,9 @@
         <spring40.version>4.0.9.RELEASE_1</spring40.version>
         <spring41.version>4.1.9.RELEASE_1</spring41.version>
         <spring42.version>4.2.9.RELEASE_1</spring42.version>
-        <spring43.version>4.3.12.RELEASE_1</spring43.version>
+        <spring43.version>4.3.14.RELEASE_1</spring43.version>
         <spring.security31.version>3.1.4.RELEASE</spring.security31.version>
+        <spring.security42.version>4.2.4.RELEASE_1</spring.security42.version>
 
         <sshd.version>1.6.0</sshd.version>
         <derby-version>10.12.1.1</derby-version>
@@ -1658,7 +1664,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.6.1</version>
+                    <version>3.7.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1678,7 +1684,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>2.10.4</version>
+                    <version>3.0.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1796,7 +1802,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-dependency-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>3.0.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -1811,7 +1817,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-war-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>3.2.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.karaf.tooling</groupId>
@@ -2004,7 +2010,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.4</version>
+                <version>3.0.0</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -2054,7 +2060,7 @@
                     <plugin>
                         <groupId>org.apache.rat</groupId>
                         <artifactId>apache-rat-plugin</artifactId>
-                        <version>0.11</version>
+                        <version>0.12</version>
                         <executions>
                             <execution>
                                 <phase>verify</phase>
@@ -2069,6 +2075,8 @@
                             <excludes>
                                 <exclude>**/*.pub</exclude>
                                 <exclude>**/target/**/*</exclude>
+                                <!-- JLine -->
+                                <exclude>**/src/main/java/jline/**/*</exclude>
                                 <!-- GIT files -->
                                 <exclude>**/.git/**/*</exclude>
                                 <!-- IDEA files -->
@@ -2094,8 +2102,10 @@
                                 <exclude>**/*.mf</exclude>
                                 <!-- test json files -->
                                 <exclude>**/*.json</exclude>
+                                <exclude>**/src/test/resources/wirings/1</exclude>
                                 <!-- SSH keys -->
 				                <exclude>**/*.key</exclude>
+                                <exclude>**/*.id_rsa</exclude>
                                 <!-- For Jenkins, ignore the .repository -->
                                 <exclude>.repository/**</exclude>
                                 <!-- jar files -->

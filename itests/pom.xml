@@ -24,7 +24,7 @@
     <parent>
         <groupId>org.apache.karaf</groupId>
         <artifactId>karaf</artifactId>
-        <version>4.1.4-SNAPSHOT</version>
+        <version>4.1.6-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -35,7 +35,7 @@
 
     <properties>
         <appendedResourcesDirectory>${basedir}/../etc/appended-resources</appendedResourcesDirectory>
-        <jetty.version>9.3.12.v20160915</jetty.version>
+        <jetty.version>9.3.21.v20170918</jetty.version>
     </properties>
 
     <dependencies>
@@ -210,6 +210,9 @@
                         <spring41.version>${spring41.version}</spring41.version>
                         <spring42.version>${spring42.version}</spring42.version>
                         <spring43.version>${spring43.version}</spring43.version>
+                        <spring50.version>${spring50.version}</spring50.version>
+                        <spring.security31.version>${spring.security31.version}</spring.security31.version>
+                        <spring.security42.version>${spring.security42.version}</spring.security42.version>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
@@ -251,11 +254,15 @@
                         <configuration>
                             <systemPropertyVariables>
                                 <org.ops4j.pax.url.mvn.localRepository>${maven.repo.local}</org.ops4j.pax.url.mvn.localRepository>
-		                <org.ops4j.pax.logging.DefaultServiceLog.level>INFO</org.ops4j.pax.logging.DefaultServiceLog.level>
+                                <org.ops4j.pax.logging.DefaultServiceLog.level>INFO</org.ops4j.pax.logging.DefaultServiceLog.level>
                                 <spring31.version>${spring31.version}</spring31.version>
                                 <spring32.version>${spring32.version}</spring32.version>
                                 <spring40.version>${spring40.version}</spring40.version>
                                 <spring41.version>${spring41.version}</spring41.version>
+                                <spring42.version>${spring42.version}</spring42.version>
+                                <spring43.version>${spring43.version}</spring43.version>
+                                <spring.security31.version>${spring.security31.version}</spring.security31.version>
+                                <spring.security42.version>${spring.security42.version}</spring.security42.version>
                     		</systemPropertyVariables>
                         </configuration>
                     </plugin>

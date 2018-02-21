@@ -379,7 +379,7 @@ if "%KARAF_PROFILER%" == "" goto :RUN
     if "%ROOT_INSTANCE_RUNNING%" == "false" SET IS_RUNNABLE=true
     if "%CHECK_ROOT_INSTANCE_RUNNING%" == "false" SET IS_RUNNABLE=true
     if "%IS_RUNNABLE%" == "true" (
-        for /f tokens^=2-5^ delims^=.-_^" %%j in ('%JAVA% -fullversion 2^>^&1') do set "JAVA_VERSION=%%k%"
+        for /f tokens^=2-5^ delims^=.-_^" %%j in ('"%JAVA%" -fullversion 2^>^&1') do set "JAVA_VERSION=%%k%"
         if "%JAVA_VERSION%" GTR 8 (
             "%JAVA%" %JAVA_OPTS% %OPTS% ^
                 --add-opens java.base/java.security=ALL-UNNAMED ^
@@ -402,7 +402,7 @@ if "%KARAF_PROFILER%" == "" goto :RUN
                 -Djava.io.tmpdir="%KARAF_DATA%\tmp" ^
                 -Dkaraf.data="%KARAF_DATA%" ^
                 -Djava.util.logging.config.file="%KARAF_BASE%\etc\java.util.logging.properties" ^
-                %KARAF_OPTS% %MAIN% %ARGS%
+                %KARAF_SYSTEM_OPTS% %KARAF_OPTS% %MAIN% %ARGS%
         ) else (
             "%JAVA%" %JAVA_OPTS% %OPTS% ^
                 -classpath "%CLASSPATH%" ^
@@ -416,7 +416,7 @@ if "%KARAF_PROFILER%" == "" goto :RUN
                 -Djava.io.tmpdir="%KARAF_DATA%\tmp" ^
                 -Dkaraf.data="%KARAF_DATA%" ^
                 -Djava.util.logging.config.file="%KARAF_BASE%\etc\java.util.logging.properties" ^
-                %KARAF_OPTS% %MAIN% %ARGS%
+                %KARAF_SYSTEM_OPTS% %KARAF_OPTS% %MAIN% %ARGS%
         )
     ) else (
         echo There is a Root instance already running with name %ROOT_INSTANCE_NAME% and pid %ROOT_INSTANCE_PID%. If you know what you are doing and want to force the run anyway, SET CHECK_ROOT_INSTANCE_RUNNING=false and re run the command.

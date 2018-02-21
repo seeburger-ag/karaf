@@ -280,7 +280,7 @@ public class Deployer {
             newRequest.overrides = request.overrides;
             newRequest.requirements = copy(dstate.state.requirements);
             for (String prereq : prereqs) {
-                addToMapSet(newRequest.requirements, ROOT_REGION, prereq);
+                addToMapSet(newRequest.requirements, ROOT_REGION, FeaturesServiceImpl.FEATURE_OSGI_REQUIREMENT_PREFIX + prereq);
             }
             newRequest.stateChanges = Collections.emptyMap();
             newRequest.updateSnaphots = request.updateSnaphots;
@@ -556,7 +556,7 @@ public class Deployer {
         //
         // Execute deployment
         //
-        // #1: stop bundles that needs to be updated or uninstalled in order
+        // #1: stop bundles that needs to be updated or uninstalled or refreshed in order
         // #2: uninstall needed bundles
         // #3: update regions
         // #4: update bundles
@@ -629,6 +629,12 @@ public class Deployer {
         for (Deployer.RegionDeployment regionDeployment : deployment.regions.values()) {
             toStop.addAll(regionDeployment.toUpdate.keySet());
             toStop.addAll(regionDeployment.toDelete);
+        }
+        if (!noRefresh) {
+            Set<Bundle> toRefreshToStopEarly = new HashSet<>(toRefresh.keySet());
+            toRefreshToStopEarly.remove(dstate.serviceBundle);
+            toStop.addAll(toRefreshToStopEarly);
+            toStart.addAll(toRefreshToStopEarly);
         }
         removeFragmentsAndBundlesInState(toStop, UNINSTALLED | RESOLVED | STOPPING);
         if (!toStop.isEmpty()) {

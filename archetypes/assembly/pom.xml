@@ -24,7 +24,7 @@
     <parent>
         <groupId>org.apache.karaf</groupId>
         <artifactId>archetypes</artifactId>
-        <version>4.1.3.SEE2-SNAPSHOT</version>
+        <version>4.1.5.SEE1-SNAPSHOT</version>
     </parent>
 
     <groupId>org.apache.karaf.archetypes</groupId>
@@ -34,7 +34,7 @@
     <description>This archetype sets up an empty karaf assembly project.</description>
 
     <properties>
-        <archetype.version>2.2</archetype.version>
+        <archetype.version>3.0.1</archetype.version>
     </properties>
 
     <build>
