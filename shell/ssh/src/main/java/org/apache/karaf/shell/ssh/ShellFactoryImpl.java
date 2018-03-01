@@ -24,14 +24,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.charset.Charset;
-import java.security.PrivilegedAction;
 import java.util.Map;
 
 import javax.security.auth.Subject;
 
 import org.apache.karaf.shell.api.console.Session;
 import org.apache.karaf.shell.api.console.SessionFactory;
-import org.apache.karaf.shell.api.console.Terminal;
 import org.apache.karaf.shell.support.ShellUtil;
 import org.apache.karaf.util.jaas.JaasHelper;
 import org.apache.sshd.common.Factory;
@@ -52,6 +50,7 @@ public class ShellFactoryImpl implements Factory<Command> {
         this.sessionFactory = sessionFactory;
     }
 
+    @Override
     public Command create() {
         return new ShellImpl();
     }
@@ -73,30 +72,35 @@ public class ShellFactoryImpl implements Factory<Command> {
 
         private boolean closed;
 
+        @Override
         public void setInputStream(final InputStream in) {
             this.in = in;
         }
 
+        @Override
         public void setOutputStream(final OutputStream out) {
             this.out = out;
         }
 
+        @Override
         public void setErrorStream(final OutputStream err) {
             this.err = err;
         }
 
+        @Override
         public void setExitCallback(ExitCallback callback) {
             this.callback = callback;
         }
 
+        @Override
         public void setSession(ServerSession session) {
             this.session = session;
         }
 
+        @Override
         public void start(final Environment env) throws IOException {
             try {
-                final Subject subject = ShellImpl.this.session != null ? ShellImpl.this.session
-                        .getAttribute(KarafJaasAuthenticator.SUBJECT_ATTRIBUTE_KEY) : null;
+                final Subject subject = null;
                 String encoding = getEncoding(env);
                 final PrintStream pout = out instanceof PrintStream ? (PrintStream) out : new PrintStream(out, true, encoding);
                 final PrintStream perr = err instanceof PrintStream ? (PrintStream) err : out == err ? pout : new PrintStream(err, true, encoding);
@@ -113,6 +117,7 @@ public class ShellFactoryImpl implements Factory<Command> {
             }
         }
 
+        @Override
         public void destroy() {
             if (!closed) {
                 closed = true;

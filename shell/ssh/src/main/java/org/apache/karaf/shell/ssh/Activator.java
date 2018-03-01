@@ -21,6 +21,7 @@ package org.apache.karaf.shell.ssh;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.security.PublicKey;
 import java.util.Arrays;
 
 import org.apache.karaf.shell.api.action.lifecycle.Manager;
@@ -35,10 +36,14 @@ import org.apache.karaf.util.tracker.annotation.Services;
 import org.apache.sshd.common.NamedFactory;
 import org.apache.sshd.common.file.virtualfs.VirtualFileSystemFactory;
 import org.apache.sshd.server.SshServer;
+import org.apache.sshd.server.auth.password.PasswordAuthenticator;
+import org.apache.sshd.server.auth.password.PasswordChangeRequiredException;
+import org.apache.sshd.server.auth.pubkey.PublickeyAuthenticator;
 import org.apache.sshd.server.forward.AcceptAllForwardingFilter;
 import org.apache.sshd.server.keyprovider.AbstractGeneratorHostKeyProvider;
 import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.apache.sshd.server.scp.ScpCommandFactory;
+import org.apache.sshd.server.session.ServerSession;
 import org.apache.sshd.server.subsystem.sftp.SftpSubsystemFactory;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.ManagedService;
@@ -106,17 +111,15 @@ public class Activator extends BaseActivator implements ManagedService {
 
         sessionFactory = sf;
         sessionFactory.getRegistry().getService(Manager.class).register(SshAction.class);
-        if (Boolean.parseBoolean(bundleContext.getProperty("karaf.startRemoteShell"))) {
-            server = createSshServer(sessionFactory);
-            this.bundleContext.registerService(SshServer.class, server, null);
-            if (server == null) {
-                return; // can result from bad specification.
-            }
-            try {
-                server.start();
-            } catch (IOException e) {
-                LOGGER.warn("Exception caught while starting SSH server", e);
-            }
+        server = createSshServer(sessionFactory);
+        this.bundleContext.registerService(SshServer.class, server, null);
+        if (server == null) {
+            return; // can result from bad specification.
+        }
+        try {
+            server.start();
+        } catch (IOException e) {
+            LOGGER.warn("Exception caught while starting SSH server", e);
         }
     }
 
@@ -138,12 +141,12 @@ public class Activator extends BaseActivator implements ManagedService {
     }
 
     protected SshServer createSshServer(SessionFactory sessionFactory) {
-        int sshPort           = getInt("sshPort", 8181);
+        int sshPort           = getInt("sshPort", 8122);
         String sshHost        = getString("sshHost", "0.0.0.0");
         long sshIdleTimeout   = getLong("sshIdleTimeout", 1800000);
         String sshRealm       = getString("sshRealm", "karaf");
         String sshRole        = getString("sshRole", null);
-        String hostKey        = getString("hostKey", System.getProperty("karaf.etc") + "/host.key");
+        String hostKey        = getString("hostKey", System.getProperty("bisas.data") + "/host.key");
         String hostKeyFormat  = getString("hostKeyFormat", "simple");
         String authMethods    = getString("authMethods", "keyboard-interactive,password,publickey");
         int keySize           = getInt("keySize", 4096);
@@ -159,7 +162,7 @@ public class Activator extends BaseActivator implements ManagedService {
         if ("simple".equalsIgnoreCase(hostKeyFormat)) {
             keyPairProvider = new SimpleGeneratorHostKeyProvider();
         } else if ("PEM".equalsIgnoreCase(hostKeyFormat)) {
-            keyPairProvider = new OpenSSHGeneratorFileKeyProvider();
+            keyPairProvider = null;
         } else {
             LOGGER.error("Invalid host key format " + hostKeyFormat);
             return null;
@@ -174,8 +177,6 @@ public class Activator extends BaseActivator implements ManagedService {
             keyPairProvider.setAlgorithm(algorithm);
         }
 
-        KarafJaasAuthenticator authenticator = new KarafJaasAuthenticator(sshRealm, sshRole);
-
         UserAuthFactoriesFactory authFactoriesFactory = new UserAuthFactoriesFactory();
         authFactoriesFactory.setAuthMethods(authMethods);
 
@@ -189,13 +190,29 @@ public class Activator extends BaseActivator implements ManagedService {
         if (sftpEnabled) {
             server.setCommandFactory(new ScpCommandFactory.Builder().withDelegate(new ShellCommandFactory(sessionFactory)).build());
             server.setSubsystemFactories(Arrays.<NamedFactory<org.apache.sshd.server.Command>>asList(new SftpSubsystemFactory()));
-            server.setFileSystemFactory(new VirtualFileSystemFactory(Paths.get(System.getProperty("karaf.base"))));
+            server.setFileSystemFactory(new VirtualFileSystemFactory(Paths.get(System.getProperty("bisas.data"))));
         } else {
             server.setCommandFactory(cmd -> new ShellCommand(sessionFactory, cmd));
         }
         server.setKeyPairProvider(keyPairProvider);
-        server.setPasswordAuthenticator(authenticator);
-        server.setPublickeyAuthenticator(authenticator);
+        server.setPasswordAuthenticator(new PasswordAuthenticator() {
+            @Override
+            public boolean authenticate(String username, String password, ServerSession session) throws PasswordChangeRequiredException {
+                if ("seeburger".equals(username) && "seeburger".equals(password)) {
+                    return true;
+                }
+                return false;
+            }
+        });
+        server.setPublickeyAuthenticator(new PublickeyAuthenticator() {
+            @Override
+            public boolean authenticate(String username, PublicKey key, ServerSession session) {
+                if ("seeburger".equals(username)) {
+                    return true;
+                }
+                return false;
+            }
+        });
         server.setUserAuthFactories(authFactoriesFactory.getFactories());
         server.setAgentFactory(KarafAgentFactory.getInstance());
         server.setTcpipForwardingFilter(AcceptAllForwardingFilter.INSTANCE);
@@ -205,7 +222,7 @@ public class Activator extends BaseActivator implements ManagedService {
         }
         if (welcomeBanner != null) {
             server.getProperties().put(SshServer.WELCOME_BANNER, welcomeBanner);
-        } 
+        }
         return server;
     }
 

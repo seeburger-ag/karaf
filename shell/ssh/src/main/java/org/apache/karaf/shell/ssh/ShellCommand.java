@@ -71,31 +71,38 @@ public class ShellCommand implements Command, Runnable, SessionAware {
         this.command = command;
     }
 
+    @Override
     public void setInputStream(InputStream in) {
         this.in = in;
     }
 
+    @Override
     public void setOutputStream(OutputStream out) {
         this.out = out;
     }
 
+    @Override
     public void setErrorStream(OutputStream err) {
         this.err = err;
     }
 
+    @Override
     public void setExitCallback(ExitCallback callback) {
         this.callback = callback;
     }
 
+    @Override
     public void setSession(ServerSession session) {
         this.session = session;
     }
 
+    @Override
     public void start(final Environment env) throws IOException {
         this.env = env;
         new Thread(this).start();
     }
 
+    @Override
     public void run() {
         int exitStatus = 0;
         try {
@@ -104,11 +111,12 @@ public class ShellCommand implements Command, Runnable, SessionAware {
                 session.put(e.getKey(), e.getValue());
             }
             try {
-                Subject subject = this.session != null ? this.session.getAttribute(KarafJaasAuthenticator.SUBJECT_ATTRIBUTE_KEY) : null;
+                Subject subject = null;
                 Object result;
                 if (subject != null) {
                     try {
                         result = JaasHelper.doAs(subject, new PrivilegedExceptionAction<Object>() {
+                            @Override
                             public Object run() throws Exception {
                                 String scriptFileName = System.getProperty(EXEC_INIT_SCRIPT);
                                 if (scriptFileName == null) {
@@ -152,6 +160,7 @@ public class ShellCommand implements Command, Runnable, SessionAware {
         }
     }
 
+    @Override
     public void destroy() {
 	}
 
