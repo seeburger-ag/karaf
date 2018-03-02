@@ -81,6 +81,12 @@
         </dependency>
 
         <dependency>
+            <groupId>com.seeburger.security</groupId>
+            <artifactId>pwd</artifactId>
+            <version>1.6.0</version>
+        </dependency>
+
+        <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>${commons-io.version}</version>

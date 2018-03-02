@@ -19,10 +19,17 @@
 package org.apache.karaf.shell.ssh;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Paths;
+import java.security.KeyPair;
 import java.security.PublicKey;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
 
 import org.apache.karaf.shell.api.action.lifecycle.Manager;
 import org.apache.karaf.shell.api.console.CommandLoggingFilter;
@@ -34,7 +41,9 @@ import org.apache.karaf.util.tracker.annotation.Managed;
 import org.apache.karaf.util.tracker.annotation.RequireService;
 import org.apache.karaf.util.tracker.annotation.Services;
 import org.apache.sshd.common.NamedFactory;
+import org.apache.sshd.common.config.keys.PublicKeyEntry;
 import org.apache.sshd.common.file.virtualfs.VirtualFileSystemFactory;
+import org.apache.sshd.common.util.security.bouncycastle.BouncyCastleGeneratorHostKeyProvider;
 import org.apache.sshd.server.SshServer;
 import org.apache.sshd.server.auth.password.PasswordAuthenticator;
 import org.apache.sshd.server.auth.password.PasswordChangeRequiredException;
@@ -51,6 +60,8 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.seeburger.security.wallet.PasswordProtector;
+
 /**
  * Activate this bundle
  */
@@ -60,11 +71,116 @@ import org.slf4j.LoggerFactory;
 @Managed("org.apache.karaf.shell")
 public class Activator extends BaseActivator implements ManagedService {
 
+    private static final String WELCOME_BANNER = "welcomeBanner";
+
+    private static final String HOST_KEY_FORMAT = "hostKeyFormat";
+
+    private static final String ALGORITHM2 = "algorithm";
+
+    private static final String KEY_SIZE = "keySize";
+
+    private static final String SSH_HOST = "ssh.bind.host";
+
+    private static final String SSH_PORT = "ssh.port";
+
+    private static final String SFTP_ENABLED = "sftpEnabled";
+
+    private static final String KEX_ALGORITHMS = "kexAlgorithms";
+
+    private static final String CIPHERS2 = "ciphers";
+
+    private static final String MACS2 = "macs";
+
+    private static final String AUTH_METHODS = "authMethods";
+
+    private static final String SSH_IDLE_TIMEOUT = "sshIdleTimeout";
+
+
+
     static final Logger LOGGER = LoggerFactory.getLogger(Activator.class);
 
     ServiceTracker<Session, Session> sessionTracker;
     SessionFactory sessionFactory;
     SshServer server;
+    private AbstractGeneratorHostKeyProvider keyProvider;
+
+    private Properties settings;
+
+    private File userConfFile;
+
+    private void initializeConfig() throws FileNotFoundException, IOException
+    {
+        File confDir = new File(System.getProperty("bisas.conf","conf"),"keys/ssh");
+        if(!confDir.exists())
+            confDir.mkdirs();
+        userConfFile = new File(confDir,"user.properties");
+        settings = new Properties();
+        File settingsFile = new File(confDir,"ssh.properties");
+        if(settingsFile.isFile())
+            load(settings,settingsFile);
+        File portsPropertiesFile = new File(System.getProperty("bisas.software","software"),"ports.properties");
+
+        Properties portsProperties = new Properties();
+        if(portsPropertiesFile.isFile())
+        {
+            load(portsProperties,portsPropertiesFile);
+        }
+        int portOffset = Integer.parseInt(portsProperties.getProperty("port.offset", "0"));
+        int sshPort = Integer.parseInt(portsProperties.getProperty("ssh.port", "8101"));
+        String bindHost = portsProperties.getProperty("ssh.bind.host", "localhost");
+        sshPort += portOffset;
+        settings.put(SSH_PORT, String.valueOf(sshPort));
+        settings.put(SSH_HOST, bindHost);
+
+        File hostKeyFile = new File(confDir,"host.key");
+
+        String hostKeyFormat  = getString(HOST_KEY_FORMAT, "PEM");
+        if ("simple".equalsIgnoreCase(hostKeyFormat)) {
+            keyProvider = new SimpleGeneratorHostKeyProvider();
+        } else if ("PEM".equalsIgnoreCase(hostKeyFormat)) {
+            keyProvider = new BouncyCastleGeneratorHostKeyProvider(hostKeyFile.toPath());
+        } else {
+            LOGGER.error("Invalid host key format " + hostKeyFormat);
+            return;
+        }
+
+        if(hostKeyFile.exists())
+        {
+            // do not trash key file if there's something wrong with it.
+            keyProvider.setOverwriteAllowed(false);
+        }
+        keyProvider.setKeySize(Integer.parseInt(settings.getProperty(KEY_SIZE, "4096")));
+        keyProvider.setAlgorithm((String)settings.getOrDefault(ALGORITHM2, "RSA"));
+        List<KeyPair> keys = keyProvider.loadKeys();
+        if(!keys.isEmpty())
+        {
+            Properties userConf = new Properties();
+            if(userConfFile.exists())
+            {
+                load(userConf,userConfFile);
+            }
+            KeyPair keyPair = keys.get(0);
+            String encoded = PublicKeyEntry.toString(keyPair.getPublic());
+            if(!encoded.equals(userConf.getProperty("seeburger.public.key")))
+            {
+                //store the current public key if it isn't correct or missing
+                userConf.put("seeburger.public.key", encoded);
+                userConf.put("seeburger", ""); //an empty password so it is disabled by default
+                try(FileOutputStream out = new FileOutputStream(userConfFile))
+                {
+                    userConf.store(out, null);
+                }
+            }
+        }
+    }
+
+    private void load(Properties props, File file) throws IOException
+    {
+        try(InputStream in = new FileInputStream(file))
+        {
+            props.load(in);
+        }
+    }
 
     @Override
     protected void doOpen() throws Exception {
@@ -94,6 +210,15 @@ public class Activator extends BaseActivator implements ManagedService {
 
     @Override
     protected void doStart() throws Exception {
+        try
+        {
+            initializeConfig();
+        }
+        catch (Exception e)
+        {
+            LOGGER.error("Exception caught while creating SSH server configuration", e);
+            return;
+        }
         SessionFactory sf = getTrackedService(SessionFactory.class);
         if (sf == null) {
             return;
@@ -141,41 +266,22 @@ public class Activator extends BaseActivator implements ManagedService {
     }
 
     protected SshServer createSshServer(SessionFactory sessionFactory) {
-        int sshPort           = getInt("sshPort", 8122);
-        String sshHost        = getString("sshHost", "0.0.0.0");
-        long sshIdleTimeout   = getLong("sshIdleTimeout", 1800000);
-        String sshRealm       = getString("sshRealm", "karaf");
-        String sshRole        = getString("sshRole", null);
-        String hostKey        = getString("hostKey", System.getProperty("bisas.data") + "/host.key");
-        String hostKeyFormat  = getString("hostKeyFormat", "simple");
-        String authMethods    = getString("authMethods", "keyboard-interactive,password,publickey");
-        int keySize           = getInt("keySize", 4096);
-        String algorithm      = getString("algorithm", "RSA");
-        String macs           = getString("macs", "hmac-sha2-512,hmac-sha2-256,hmac-sha1");
-        String ciphers        = getString("ciphers", "aes128-ctr,arcfour128,aes128-cbc,3des-cbc,blowfish-cbc");
-        String kexAlgorithms  = getString("kexAlgorithms", "diffie-hellman-group-exchange-sha256,ecdh-sha2-nistp521,ecdh-sha2-nistp384,ecdh-sha2-nistp256,diffie-hellman-group-exchange-sha1,diffie-hellman-group1-sha1");
-        String welcomeBanner  = getString("welcomeBanner", null);
-        String moduliUrl      = getString("moduli-url", null);
-        boolean sftpEnabled   = getBoolean("sftpEnabled", true);
-
-        AbstractGeneratorHostKeyProvider keyPairProvider;
-        if ("simple".equalsIgnoreCase(hostKeyFormat)) {
-            keyPairProvider = new SimpleGeneratorHostKeyProvider();
-        } else if ("PEM".equalsIgnoreCase(hostKeyFormat)) {
-            keyPairProvider = null;
-        } else {
-            LOGGER.error("Invalid host key format " + hostKeyFormat);
-            return null;
-        }
-
-        keyPairProvider.setPath(Paths.get(hostKey));
-        if (new File(hostKey).exists()) {
-            // do not trash key file if there's something wrong with it.
-            keyPairProvider.setOverwriteAllowed(false);
-        } else {
-            keyPairProvider.setKeySize(keySize);
-            keyPairProvider.setAlgorithm(algorithm);
-        }
+        int sshPort           = Integer.parseInt(settings.getProperty(SSH_PORT));
+        String sshHost        = settings.getProperty(SSH_HOST);
+        long sshIdleTimeout   = Long.parseLong(settings.getProperty(SSH_IDLE_TIMEOUT, "1800000"));
+//        String sshRealm       = settings.getProperty("sshRealm", "karaf");
+//        String sshRole        = settings.getProperty("sshRole", null);
+//        String hostKey        = getString("hostKey", System.getProperty("bisas.conf") + "/keys/host.key");
+//        String hostKeyFormat  = getString(HOST_KEY_FORMAT, "PEM");
+        String authMethods    = settings.getProperty(AUTH_METHODS, "keyboard-interactive,password,publickey");
+//        int keySize           = getInt(KEY_SIZE, 4096);
+//        String algorithm      = getString(ALGORITHM2, "RSA");
+        String macs           = settings.getProperty(MACS2, "hmac-sha2-512,hmac-sha2-256,hmac-sha1");
+        String ciphers        = settings.getProperty(CIPHERS2, "aes128-ctr,arcfour128,aes128-cbc,3des-cbc,blowfish-cbc");
+        String kexAlgorithms  = settings.getProperty(KEX_ALGORITHMS, "diffie-hellman-group-exchange-sha256,ecdh-sha2-nistp521,ecdh-sha2-nistp384,ecdh-sha2-nistp256,diffie-hellman-group-exchange-sha1,diffie-hellman-group1-sha1");
+        String welcomeBanner  = settings.getProperty(WELCOME_BANNER, null);
+        String moduliUrl      = settings.getProperty("moduli-url", null);
+        boolean sftpEnabled   = Boolean.valueOf(settings.getProperty(SFTP_ENABLED, "false"));
 
         UserAuthFactoriesFactory authFactoriesFactory = new UserAuthFactoriesFactory();
         authFactoriesFactory.setAuthMethods(authMethods);
@@ -194,21 +300,45 @@ public class Activator extends BaseActivator implements ManagedService {
         } else {
             server.setCommandFactory(cmd -> new ShellCommand(sessionFactory, cmd));
         }
-        server.setKeyPairProvider(keyPairProvider);
+        server.setKeyPairProvider(keyProvider);
         server.setPasswordAuthenticator(new PasswordAuthenticator() {
             @Override
             public boolean authenticate(String username, String password, ServerSession session) throws PasswordChangeRequiredException {
-                if ("seeburger".equals(username) && "seeburger".equals(password)) {
-                    return true;
+                if(password==null || password.isEmpty())
+                    return false;
+                Properties userProps = new Properties();
+                try
+                {
+                    String decoded = new String(PasswordProtector.strip(userProps.getProperty(username,"").toCharArray()));
+                    load(userProps, userConfFile);
+                    return password.equals(decoded);
+                }
+                catch(Exception e)
+                {
+                    LOGGER.error("Failed to parse user.properties",e);
                 }
                 return false;
             }
         });
-        server.setPublickeyAuthenticator(new PublickeyAuthenticator() {
+        server.setPublickeyAuthenticator(new PublickeyAuthenticator()
+        {
             @Override
-            public boolean authenticate(String username, PublicKey key, ServerSession session) {
-                if ("seeburger".equals(username)) {
-                    return true;
+            public boolean authenticate(String username, PublicKey key, ServerSession session)
+            {
+                Properties userProps = new Properties();
+                try
+                {
+                    load(userProps, userConfFile);
+                    if(userProps.containsKey(username+".public.key"))
+                    {
+                        String given = PublicKeyEntry.toString(key);
+                        String expected = userProps.getProperty(username+".public.key");
+                        return given.equals(expected);
+                    }
+                }
+                catch (IOException e)
+                {
+                    LOGGER.error("Failed to parse user.properties",e);
                 }
                 return false;
             }
