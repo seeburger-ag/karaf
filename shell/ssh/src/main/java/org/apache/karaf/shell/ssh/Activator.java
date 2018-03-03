@@ -161,11 +161,11 @@ public class Activator extends BaseActivator implements ManagedService {
             }
             KeyPair keyPair = keys.get(0);
             String encoded = PublicKeyEntry.toString(keyPair.getPublic());
-            if(!encoded.equals(userConf.getProperty("seeburger.public.key")))
+            if(!encoded.equals(userConf.getProperty("admin.public.key")))
             {
                 //store the current public key if it isn't correct or missing
-                userConf.put("seeburger.public.key", encoded);
-                userConf.put("seeburger", ""); //an empty password so it is disabled by default
+                userConf.put("admin.public.key", encoded);
+                userConf.put("admin", ""); //an empty password so it is disabled by default
                 try(FileOutputStream out = new FileOutputStream(userConfFile))
                 {
                     userConf.store(out, null);
