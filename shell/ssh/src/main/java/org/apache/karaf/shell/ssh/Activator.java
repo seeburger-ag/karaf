@@ -309,8 +309,8 @@ public class Activator extends BaseActivator implements ManagedService {
                 Properties userProps = new Properties();
                 try
                 {
-                    String decoded = new String(PasswordProtector.strip(userProps.getProperty(username,"").toCharArray()));
                     load(userProps, userConfFile);
+                    String decoded = new String(PasswordProtector.strip(userProps.getProperty(username,"").toCharArray()));
                     return password.equals(decoded);
                 }
                 catch(Exception e)
