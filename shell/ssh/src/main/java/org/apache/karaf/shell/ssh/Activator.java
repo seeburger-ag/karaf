@@ -113,7 +113,7 @@ public class Activator extends BaseActivator implements ManagedService {
         File confDir = new File(System.getProperty("bisas.conf","conf"),"keys/ssh");
         if(!confDir.exists())
             confDir.mkdirs();
-        userConfFile = new File(confDir,"user.properties");
+        userConfFile = new File(confDir,"users.properties");
         settings = new Properties();
         File settingsFile = new File(confDir,"ssh.properties");
         if(settingsFile.isFile())
@@ -315,7 +315,7 @@ public class Activator extends BaseActivator implements ManagedService {
                 }
                 catch(Exception e)
                 {
-                    LOGGER.error("Failed to parse user.properties",e);
+                    LOGGER.error("Failed to parse users.properties",e);
                 }
                 return false;
             }
@@ -338,7 +338,7 @@ public class Activator extends BaseActivator implements ManagedService {
                 }
                 catch (IOException e)
                 {
-                    LOGGER.error("Failed to parse user.properties",e);
+                    LOGGER.error("Failed to parse users.properties",e);
                 }
                 return false;
             }
