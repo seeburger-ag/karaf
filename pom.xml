@@ -31,7 +31,7 @@
     <groupId>org.apache.karaf</groupId>
     <artifactId>karaf</artifactId>
     <packaging>pom</packaging>
-    <version>4.1.5.SEE1-SNAPSHOT</version>
+    <version>4.1.5.SEEJBOSS1-SNAPSHOT</version>
     <name>Apache Karaf</name>
     <inceptionYear>2007</inceptionYear>
 
@@ -48,7 +48,10 @@
 
     <modules>
         <module>util</module>
-        <module>main</module>
+        <module>shell</module>
+        <module>jaas</module>
+        <module>service</module>
+        <!-- <module>main</module>
         <module>features</module>
         <module>kar</module>
         <module>bundle</module>
@@ -56,11 +59,8 @@
         <module>instance</module>
         <module>package</module>
         <module>http</module>
-        <module>service</module>
         <module>log</module>
         <module>deployer</module>
-        <module>shell</module>
-        <module>jaas</module>
         <module>client</module>
         <module>management</module>
         <module>system</module>
@@ -80,7 +80,7 @@
         <module>subsystem</module>
         <module>profile</module>
         <module>event</module>
-        <module>tooling</module>
+        <module>tooling</module> -->
         <!-- <module>assemblies</module> -->
         <!-- <module>demos</module> -->
         <!-- <module>archetypes</module> -->
