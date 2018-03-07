@@ -81,9 +81,9 @@
         <module>profile</module>
         <module>event</module>
         <module>tooling</module>
-        <module>assemblies</module>
-        <module>demos</module>
-        <module>archetypes</module>
+        <!-- <module>assemblies</module> -->
+        <!-- <module>demos</module> -->
+        <!-- <module>archetypes</module> -->
         <!-- <module>itests</module> -->
     </modules>
 
