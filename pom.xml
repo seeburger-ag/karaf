@@ -155,14 +155,7 @@
         <asm.springsource.version>1.5.3</asm.springsource.version>
         <cglib.bundle.version>3.2.4_1</cglib.bundle.version>
         <cglib2.version>2.2.0</cglib2.version>
-<<<<<<< HEAD
-
-        <jna.version>4.4.0</jna.version>
-
-=======
-        
         <jna.version>4.5.0</jna.version>
->>>>>>> refs/remotes/upstream/karaf-4.1.x
         <commons-beanutils.version>1.9.2</commons-beanutils.version>
         <commons-codec.version>1.10</commons-codec.version>
         <commons-compress.version>1.15</commons-compress.version>
@@ -206,8 +199,8 @@
         <felix.gogo.jline.version>1.0.6</felix.gogo.jline.version>
         <felix.httplite.version>0.1.6</felix.httplite.version>
         <felix.inventory.version>1.0.4</felix.inventory.version>
-        <felix.plugin.version>3.3.0</felix.plugin.version>
-        <felix.utils.version>1.10.0</felix.utils.version>
+        <felix.plugin.version>3.5.0</felix.plugin.version>
+        <felix.utils.version>1.10.4</felix.utils.version>
         <felix.webconsole.version>4.3.4</felix.webconsole.version>
         <felix.webconsole.api.version>3.1.2</felix.webconsole.api.version>
         <felix.metatype.version>1.1.6</felix.metatype.version>
@@ -231,10 +224,10 @@
         <aries.blueprint.spring.version>0.4.0</aries.blueprint.spring.version>
         <aries.blueprint.spring.extender.version>0.3.0</aries.blueprint.spring.extender.version>
         <aries.jmx.api.version>1.1.5</aries.jmx.api.version>
-        <aries.jmx.core.version>1.1.7</aries.jmx.core.version>
-        <aries.jmx.blueprint.api.version>1.1.5</aries.jmx.blueprint.api.version>
-        <aries.jmx.blueprint.core.version>1.1.5</aries.jmx.blueprint.core.version>
-        <aries.jmx.whiteboard.version>1.1.5</aries.jmx.whiteboard.version>
+        <aries.jmx.core.version>1.1.8</aries.jmx.core.version>
+        <aries.jmx.blueprint.api.version>1.2.0</aries.jmx.blueprint.api.version>
+        <aries.jmx.blueprint.core.version>1.2.0</aries.jmx.blueprint.core.version>
+        <aries.jmx.whiteboard.version>1.2.0</aries.jmx.whiteboard.version>
         <aries.jpa.version>2.6.1</aries.jpa.version>
         <aries.jpa.blueprint.aries.version>1.0.4</aries.jpa.blueprint.aries.version>
         <aries.jpa.api.version>1.0.2</aries.jpa.api.version>
