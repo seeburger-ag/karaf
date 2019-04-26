@@ -24,7 +24,7 @@
     <parent>
         <groupId>org.apache.karaf.tooling</groupId>
         <artifactId>tooling</artifactId>
-        <version>4.2.5.SEE2</version>
+        <version>4.2.5.SEE3-SNAPSHOT</version>
     </parent>
 
     <artifactId>org.apache.karaf.tools.utils</artifactId>
