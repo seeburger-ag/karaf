@@ -29,10 +29,14 @@ import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 import org.apache.felix.gogo.runtime.threadio.ThreadIOImpl;
 import org.apache.felix.service.threadio.ThreadIO;
 import org.apache.karaf.shell.api.action.lifecycle.Manager;
@@ -50,6 +54,9 @@ public class Main {
 
     private String application = System.getProperty("karaf.name", "root");
     private String user = "karaf";
+    private String REDIRECTED_CLASS_PATH_MANIFEST_NAME = "Bundle-ClassPath";
+    private String JAR_EXTENSION = ".jar";
+    private String EXPANDED_JAR_FOLDER = "shell_lib";
 
     public static void main(String args[]) throws Exception {
         Package p = Package.getPackage("org.apache.karaf.shell.impl.console.standalone");
@@ -127,12 +134,45 @@ public class Main {
         ClassLoader cl = Main.class.getClassLoader();
         if (classpath != null) {
             List<URL> urls = getFiles(new File(classpath));
+            // Load jars in class path to be able to load jars inside them
+            List<URL> jarsInJars = getJarsInJars(urls);
+            urls.addAll(jarsInJars);
             cl = new URLClassLoader(urls.toArray(new URL[urls.size()]), cl);
         }
 
         SessionFactory sessionFactory = createSessionFactory(threadio);
 
         run(sessionFactory, sb.toString(), in, out, err, cl);
+    }
+
+    private List<URL> getJarsInJars(List<URL> urls) throws IOException {
+        List<URL> result = new ArrayList<>();
+        File tempFolder = new File(System.getProperty("java.io.tmpdir", "."), EXPANDED_JAR_FOLDER);
+        tempFolder.mkdirs();
+        for (URL url : urls) {
+            try (JarFile jarFile = new JarFile(url.getFile())) {
+                Manifest manifest = jarFile.getManifest();
+                String embeddedArtifacts = manifest.getMainAttributes().getValue(REDIRECTED_CLASS_PATH_MANIFEST_NAME);
+                if (embeddedArtifacts != null) {
+                    String[] artifacts = embeddedArtifacts.split( "," );
+                    for ( String artifact : artifacts ) {
+                        if (!artifact.endsWith(JAR_EXTENSION ) || jarFile.getEntry(artifact) == null) {
+                            continue;
+                        }
+
+                        File outputFile = new File (tempFolder,artifact);
+                        if (!outputFile.exists())
+                        {
+                            outputFile.getParentFile().mkdirs();
+                            Files.copy(jarFile.getInputStream(jarFile.getEntry(artifact)), outputFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        }
+                        result.add(outputFile.toURI().toURL());
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 
     private void run(final SessionFactory sessionFactory, String command, final InputStream in, final PrintStream out, final PrintStream err, ClassLoader cl) throws Exception {
