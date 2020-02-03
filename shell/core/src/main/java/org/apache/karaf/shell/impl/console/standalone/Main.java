@@ -29,6 +29,8 @@ import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -44,7 +46,6 @@ import org.apache.karaf.shell.impl.action.command.ManagerImpl;
 import org.apache.karaf.shell.impl.console.JLineTerminal;
 import org.apache.karaf.shell.impl.console.SessionFactoryImpl;
 import org.apache.karaf.shell.impl.console.loader.JarInJarConstants;
-import org.apache.karaf.shell.impl.console.loader.JarInJarURLStreamHandlerFactory;
 import org.apache.karaf.shell.support.NameScoping;
 import org.apache.karaf.shell.support.ShellUtil;
 import org.jline.terminal.TerminalBuilder;
@@ -53,6 +54,7 @@ public class Main {
 
     private String application = System.getProperty("karaf.name", "root");
     private String user = "karaf";
+    private String EXPANDED_JAR_FOLDER = "shell_lib";
 
     public static void main(String args[]) throws Exception {
         Package p = Package.getPackage("org.apache.karaf.shell.impl.console.standalone");
@@ -131,15 +133,8 @@ public class Main {
         if (classpath != null) {
             List<URL> urls = getFiles(new File(classpath));
             // Load jars in class path to be able to load jars inside them
-            ClassLoader tmpClassLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]), cl);
-            URL.setURLStreamHandlerFactory(new JarInJarURLStreamHandlerFactory( tmpClassLoader));
             List<URL> jarsInJars = getJarsInJars(urls);
-            // Create ClassLoader with jars in jars and parent main ClassLoader
-            cl = new URLClassLoader(jarsInJars.toArray(new URL[jarsInJars.size()]), cl);
-            // Load original Jars with jarsInJars ClassLoader as parent.
-            // This is needed cause if you load Class from main jar which depends on class in inner jar.
-            // The loaded class has its class loader and resolve dependant classes in its or parent classloaders
-            // which exclude jarInJar classloader.
+            urls.addAll(jarsInJars);
             cl = new URLClassLoader(urls.toArray(new URL[urls.size()]), cl);
         }
 
@@ -150,6 +145,8 @@ public class Main {
 
     private List<URL> getJarsInJars(List<URL> urls) throws IOException {
         List<URL> result = new ArrayList<>();
+        File tempFolder = new File(System.getProperty("java.io.tmpdir", "."), EXPANDED_JAR_FOLDER);
+        tempFolder.mkdirs();
         for (URL url : urls) {
             try (JarFile jarFile = new JarFile(url.getFile())) {
                 Manifest manifest = jarFile.getManifest();
@@ -157,14 +154,22 @@ public class Main {
                 if (embeddedArtifacts != null) {
                     String[] artifacts = embeddedArtifacts.split( "," );
                     for ( String artifact : artifacts ) {
-                        if (!artifact.endsWith(JarInJarConstants.JAR_EXTENSION )) {
+                        if (!artifact.endsWith(JarInJarConstants.JAR_EXTENSION ) || jarFile.getEntry(artifact) == null) {
                             continue;
                         }
-                        result.add(new URL(JarInJarConstants.JAR_INTERNAL_URL_PROTOCOL_WITH_COLON + artifact + JarInJarConstants.JAR_INTERNAL_SEPARATOR));
+
+                        File outputFile = new File (tempFolder,artifact);
+                        if (!outputFile.exists())
+                        {
+                            outputFile.getParentFile().mkdirs();
+                            Files.copy(jarFile.getInputStream(jarFile.getEntry(artifact)), outputFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        }
+                        result.add(outputFile.toURI().toURL());
                     }
                 }
             }
         }
+
         return result;
     }
 
