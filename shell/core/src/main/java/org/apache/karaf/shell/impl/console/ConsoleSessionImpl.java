@@ -419,7 +419,7 @@ public class ConsoleSessionImpl implements Session {
 
     /**
      * On the local console we only show the welcome banner once. This allows to suppress the banner
-     * on refreshs of the shell core bundle. 
+     * on refreshs of the shell core bundle.
      * On ssh we show it every time.
      */
     private void welcomeBanner() {
@@ -465,7 +465,7 @@ public class ConsoleSessionImpl implements Session {
     private void doExecute(CharSequence command) {
         try {
             Object result = session.execute(command);
-            if (result != null) {
+            if (result != null && !(result instanceof Integer)) {
                 session.getConsole().println(session.format(result, Converter.INSPECT));
             }
         } catch (InterruptedException e) {
