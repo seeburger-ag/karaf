@@ -193,6 +193,10 @@ public abstract class AbstractFeatureMojo extends MojoSupport {
     protected void addFeaturesDependencies(List<Dependency> featureNames, Set<Feature> features, Map<String, Feature> featuresMap, boolean transitive) {
         for (Dependency dependency : featureNames) {
             Feature f = getMatchingFeature(featuresMap, dependency.getName(), dependency.getVersion());
+            if (features.contains(f)) {
+                // skip already traversed features
+                continue;
+            }
             features.add(f);
             if (transitive) {
                 addFeaturesDependencies(f.getFeature(), features, featuresMap, true);
