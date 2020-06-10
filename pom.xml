@@ -203,7 +203,7 @@
         <felix.connect.version>0.2.0</felix.connect.version>
         <felix.coordinator.version>1.0.2</felix.coordinator.version>
         <felix.fileinstall.version>3.6.6</felix.fileinstall.version>
-        <felix.framework.version>5.6.12</felix.framework.version>
+        <felix.framework.version>5.6.12.SEE2</felix.framework.version>
         <felix.framework.security.version>2.6.1</felix.framework.security.version>
         <felix.gogo.runtime.version>1.1.2</felix.gogo.runtime.version>
         <felix.gogo.jline.version>1.1.6</felix.gogo.jline.version>
@@ -2420,7 +2420,7 @@
             <properties>
                 <surefire.argLine>
                                   --add-opens java.base/java.security=ALL-UNNAMED
-                                  --add-opens java.base/java.net=ALL-UNNAMED 
+                                  --add-opens java.base/java.net=ALL-UNNAMED
                                   --add-opens java.base/java.lang=ALL-UNNAMED
                                   --add-opens java.base/java.util=ALL-UNNAMED
                                   --add-opens java.naming/javax.naming.spi=ALL-UNNAMED
