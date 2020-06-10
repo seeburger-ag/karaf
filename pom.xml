@@ -35,6 +35,17 @@
     <name>Apache Karaf</name>
     <inceptionYear>2007</inceptionYear>
 
+    <distributionManagement>
+        <repository>
+            <id>release</id>
+            <url>http://repo.seeburger.de/archiva/repository/release/</url>
+        </repository>
+        <snapshotRepository>
+            <id>snapshot}</id>
+            <url>http://repo.seeburger.de/archiva/repository/snapshot/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
     <modules>
         <module>util</module>
         <module>main</module>
@@ -77,13 +88,12 @@
         <module>assemblies</module>
         <module>examples</module>
         <module>archetypes</module>
-        <module>itests</module>
+        <!-- <module>itests</module> -->
     </modules>
 
     <scm>
-        <connection>scm:git:https://gitbox.apache.org/repos/asf/karaf.git</connection>
-        <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/karaf.git</developerConnection>
-        <url>https://gitbox.apache.org/repos/asf?p=karaf.git;a=summary</url>
+        <connection>scm:git:git@github.com:seeburger-ag/karaf.git</connection>
+        <developerConnection>scm:git:git@github.com:seeburger-ag/karaf.git</developerConnection>
       <tag>HEAD</tag>
   </scm>
 
@@ -151,7 +161,7 @@
         <cxf.version>3.3.5</cxf.version>
         <jackson.version>2.10.4</jackson.version>
         <jna.version>5.5.0</jna.version>
-        <jaxb.version>2.3.3</jaxb.version> 
+        <jaxb.version>2.3.3</jaxb.version>
         <commons-beanutils.version>1.9.4</commons-beanutils.version>
         <commons-codec.version>1.14</commons-codec.version>
         <commons-compress.version>1.20</commons-compress.version>
@@ -1627,7 +1637,7 @@
                 <artifactId>org.apache.aries.subsystem.api</artifactId>
                 <version>${aries.subsystem.api.version}</version>
             </dependency>
-     
+
             <dependency>
                 <groupId>org.apache.aries.subsystem</groupId>
                 <artifactId>org.apache.aries.subsystem.core</artifactId>
@@ -2265,9 +2275,9 @@
         </profile>
         <profile>
             <id>release</id>
-            <modules>
+<!--             <modules>
                 <module>manual</module>
-            </modules>
+            </modules> -->
             <build>
                 <plugins>
                     <!-- We want to deploy the artifact to a staging location for perusal -->
@@ -2292,6 +2302,7 @@
                                     <goal>sign</goal>
                                 </goals>
                                 <configuration>
+                                  <skip>true</skip>
                                   <gpgArguments>
                                     <arg>--pinentry-mode</arg>
                                     <arg>loopback</arg>
