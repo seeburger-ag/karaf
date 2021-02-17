@@ -24,7 +24,7 @@
     <parent>
         <artifactId>karaf</artifactId>
         <groupId>org.apache.karaf</groupId>
-        <version>4.3.0.SEE3-SNAPSHOT</version>
+        <version>4.3.0.SEE3</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
