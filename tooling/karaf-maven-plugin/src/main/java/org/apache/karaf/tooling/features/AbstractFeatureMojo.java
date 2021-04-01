@@ -208,6 +208,11 @@ public abstract class AbstractFeatureMojo extends MojoSupport {
     protected void addFeaturesDependencies(List<Dependency> featureNames, Set<Feature> features, Map<String, Feature> featuresMap, boolean transitive) {
         for (Dependency dependency : featureNames) {
             List<Feature> innerFeatures = getMatchingFeature(featuresMap, dependency.getName(), dependency.getVersion());
+            if (features.containsAll(innerFeatures)) {
+                // skip already traversed features
+                continue;
+            }
+
             for (Feature f : innerFeatures) {
                 features.add(f);
                 if (transitive) {
