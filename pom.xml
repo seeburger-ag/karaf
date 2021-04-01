@@ -31,7 +31,7 @@
     <groupId>org.apache.karaf</groupId>
     <artifactId>karaf</artifactId>
     <packaging>pom</packaging>
-    <version>4.3.2-SNAPSHOT</version>
+    <version>4.3.1.SEE1</version>
     <name>Apache Karaf</name>
     <inceptionYear>2007</inceptionYear>
 
@@ -94,7 +94,7 @@
     <scm>
         <connection>scm:git:git@github.com:seeburger-ag/karaf.git</connection>
         <developerConnection>scm:git:git@github.com:seeburger-ag/karaf.git</developerConnection>
-      <tag>HEAD</tag>
+      <tag>karaf-4.3.1.SEE1</tag>
   </scm>
 
     <issueManagement>
