@@ -34,9 +34,9 @@
 
     <properties>
         <appendedResourcesDirectory>${basedir}/../../etc/appended-resources</appendedResourcesDirectory>
-        <mvn.opts />
-        <invoker.skip />
-        <compiler.fork />
+        <mvn.opts/>
+        <invoker.skip/>
+        <compiler.fork/>
         <jacoco-class-line-covered-ratio>0.00</jacoco-class-line-covered-ratio>
         <jacoco-class-instruction-covered-ratio>0.00</jacoco-class-instruction-covered-ratio>
         <jacoco-class-missed-count-maximum>1</jacoco-class-missed-count-maximum>
@@ -211,7 +211,7 @@
         <dependency>
             <groupId>org.apache.maven.shared</groupId>
             <artifactId>maven-filtering</artifactId>
-            <version>3.1.1</version>
+            <version>3.2.0</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.plexus</groupId>
