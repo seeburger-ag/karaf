@@ -30,7 +30,6 @@ import java.util.regex.Pattern;
 import org.apache.felix.utils.version.VersionRange;
 import org.apache.felix.utils.version.VersionTable;
 import org.apache.karaf.features.BundleInfo;
-import org.apache.karaf.features.Conditional;
 import org.apache.karaf.features.internal.model.*;
 import org.apache.karaf.tooling.utils.MojoSupport;
 import org.apache.maven.artifact.Artifact;
@@ -44,10 +43,10 @@ import org.osgi.framework.Version;
  * Common functionality for mojos that need to resolve features
  */
 public abstract class AbstractFeatureMojo extends MojoSupport {
-    
+
     @Parameter
     protected List<String> descriptors;
-    
+
     protected Set<Artifact> descriptorArtifacts;
 
     @Parameter
@@ -73,7 +72,7 @@ public abstract class AbstractFeatureMojo extends MojoSupport {
      */
     @Parameter(defaultValue = "false")
     protected boolean ignoreDependencyFlag;
-    
+
     /**
      * The start level exported when no explicit start level is set for a bundle
      */
@@ -149,7 +148,7 @@ public abstract class AbstractFeatureMojo extends MojoSupport {
     /**
      * Resolves and copies the given artifact to the repository path.
      * Prefers to resolve using the repository of the artifact if present.
-     * 
+     *
      * @param artifact The artifact.
      * @param remoteRepos The {@link List} of remote repositories to use for artifact resolution.
      */
@@ -159,7 +158,7 @@ public abstract class AbstractFeatureMojo extends MojoSupport {
             if (artifact == null) {
                 return;
             }
-            List<ArtifactRepository> usedRemoteRepos = artifact.getRepository() != null ? 
+            List<ArtifactRepository> usedRemoteRepos = artifact.getRepository() != null ?
                     Collections.singletonList(artifact.getRepository())
                     : remoteRepos;
             artifactResolver.resolve(artifact, usedRemoteRepos, localRepo);
@@ -176,7 +175,7 @@ public abstract class AbstractFeatureMojo extends MojoSupport {
     /**
      * Populate the features by traversing the listed features and their
      * dependencies if transitive is true
-     *  
+     *
      * @param featureNames The {@link List} of feature names.
      * @param features The {@link Set} of features.
      * @param featuresMap The {@link Map} of features.
@@ -190,16 +189,7 @@ public abstract class AbstractFeatureMojo extends MojoSupport {
                 features.add(f);
                 if (transitive) {
                     addFeaturesDependencies(f.getFeature(), features, featuresMap, true);
-                    for (Conditional conditional : f.getConditional()) {
-                        for (org.apache.karaf.features.Dependency dep : conditional.getDependencies()) {
-                            List<Feature> cfs = getMatchingFeature(featuresMap, dep.getName(), dep.getVersion());
-                            for (Feature cf : cfs) {
-                                features.add(cf);
-                                addFeaturesDependencies(cf.getFeature(), features, featuresMap, transitive);
-                            }
-                        }
-                    }
-
+                    addFeaturesConditionals(f.getConditional(), features, featuresMap);
                 }
             }
         }
@@ -217,15 +207,25 @@ public abstract class AbstractFeatureMojo extends MojoSupport {
                 features.add(f);
                 if (transitive) {
                     addFeaturesDependencies(f.getFeature(), features, featuresMap, true);
-                    for (Conditional conditional : f.getConditional()) {
-                        for (org.apache.karaf.features.Dependency dep : conditional.getDependencies()) {
-                            List<Feature> cfs = getMatchingFeature(featuresMap, dep.getName(), dep.getVersion());
-                            for (Feature cf : cfs) {
-                                features.add(cf);
-                                addFeaturesDependencies(cf.getFeature(), features, featuresMap, transitive);
-                            }
-                        }
-                    }
+                    addFeaturesConditionals(f.getConditional(), features, featuresMap);
+                }
+            }
+        }
+    }
+
+    protected void addFeaturesConditionals(List<Conditional> conditionals, Set<Feature> features, Map<String, Feature> featuresMap) {
+        for (Conditional conditional : conditionals) {
+            for (org.apache.karaf.features.Dependency dep : conditional.getDependencies()) {
+                List<Feature> innerFeatures = getMatchingFeature(featuresMap, dep.getName(), dep.getVersion());
+                if (features.containsAll(innerFeatures)) {
+                    // skip already traversed features
+                    continue;
+                }
+
+                for (Feature f : innerFeatures) {
+                    features.add(f);
+                    addFeaturesDependencies(f.getFeature(), features, featuresMap, true);
+                    addFeaturesConditionals(f.getConditional(), features, featuresMap);
                 }
             }
         }
@@ -255,7 +255,7 @@ public abstract class AbstractFeatureMojo extends MojoSupport {
                         String verStr = featuresMap.get(key).getVersion();
                         Version ver = VersionTable.getVersion(verStr);
                         if (versionRange.contains(ver)) {
-                            if (f == null || VersionTable.getVersion(f.getVersion()).compareTo(VersionTable.getVersion(featuresMap.get(key).getVersion())) < 0) {    
+                            if (f == null || VersionTable.getVersion(f.getVersion()).compareTo(VersionTable.getVersion(featuresMap.get(key).getVersion())) < 0) {
                                 features.add(featuresMap.get(key));
                             }
                         }
@@ -286,14 +286,14 @@ public abstract class AbstractFeatureMojo extends MojoSupport {
             for (String uri : descriptors) {
                 retrieveDescriptorsRecursively(uri, artifactsToCopy, featuresMap);
             }
-    
+
             // no features specified, handle all of them
             if (features == null) {
                 features = new ArrayList<>(featuresMap.keySet());
             }
-            
+
             addFeatures(features, featuresSet, featuresMap, addTransitiveFeatures);
-    
+
             getLog().info("Using local repository at: " + localRepo.getUrl());
             for (Feature feature : featuresSet) {
                 try {
@@ -313,7 +313,7 @@ public abstract class AbstractFeatureMojo extends MojoSupport {
                 } catch (RuntimeException e) {
                     throw new RuntimeException("Error resolving feature " + feature.getName() + "/" + feature.getVersion(), e);
                 }
-            }            
+            }
         } catch (Exception e) {
             throw new MojoExecutionException("Error populating repository", e);
         }
