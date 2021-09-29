@@ -77,7 +77,7 @@
         <module>assemblies</module>
         <module>examples</module>
         <module>archetypes</module>
-        <module>itests</module>
+<!--         <module>itests</module> -->
     </modules>
 
     <scm>
@@ -150,18 +150,18 @@
     </developers>
 
     <properties>
-        <project.build.outputTimestamp>1</project.build.outputTimestamp>        
+        <project.build.outputTimestamp>1</project.build.outputTimestamp>
 
-        <scm.connection>scm:git:https://gitbox.apache.org/repos/asf/karaf.git</scm.connection>
-        <scm.developerConnection>scm:git:https://gitbox.apache.org/repos/asf/karaf.git</scm.developerConnection>
-        <scm.url>https://gitbox.apache.org/repos/asf?p=karaf.git;a=summary</scm.url>
+        <scm.connection>scm:git:git@github.com:seeburger-ag/karaf.git</scm.connection>
+        <scm.developerConnection>scm:git:git@github.com:seeburger-ag/karaf.git</scm.developerConnection>
+        <scm.url>https://github.com/seeburger-ag/karaf/</scm.url>
 
-        <distributionManagement.release.id>apache.releases.https</distributionManagement.release.id>
-        <distributionManagement.release.name>Apache Release Distribution Repository</distributionManagement.release.name>
-        <distributionManagement.release.url>https://repository.apache.org/service/local/staging/deploy/maven2</distributionManagement.release.url>
-        <distributionManagement.snapshot.id>apache.snapshots.https</distributionManagement.snapshot.id>
-        <distributionManagement.snapshot.name>Apache Development Snapshot Repository</distributionManagement.snapshot.name>
-        <distributionManagement.snapshot.url>https://repository.apache.org/content/repositories/snapshots</distributionManagement.snapshot.url>
+        <distributionManagement.release.id>release</distributionManagement.release.id>
+        <distributionManagement.release.name>SEEBURGER Release Distribution Repository</distributionManagement.release.name>
+        <distributionManagement.release.url>http://repo.seeburger.de/archiva/repository/release/</distributionManagement.release.url>
+        <distributionManagement.snapshot.id>snapshot</distributionManagement.snapshot.id>
+        <distributionManagement.snapshot.name>SEEBURGER Development Snapshot Repository</distributionManagement.snapshot.name>
+        <distributionManagement.snapshot.url>http://repo.seeburger.de/archiva/repository/snapshot/</distributionManagement.snapshot.url>
 
         <activemq.version>5.15.11</activemq.version>
         <aopalliance.bundle.version>1.0_6</aopalliance.bundle.version>
@@ -427,7 +427,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-gpg-plugin</artifactId>
-                    <version>1.6</version>
+                    <version>3.0.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -848,9 +848,9 @@
         </profile>
         <profile>
             <id>release</id>
-            <modules>
-                <module>manual</module>
-            </modules>
+<!--             <modules> -->
+<!--                 <module>manual</module> -->
+<!--             </modules> -->
             <build>
                 <plugins>
                     <!-- We want to deploy the artifact to a staging location for perusal -->
@@ -869,12 +869,13 @@
                         <artifactId>maven-gpg-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>sign-artifacts</id>
+                                <id>sign-release-artifacts</id>
                                 <phase>verify</phase>
                                 <goals>
                                     <goal>sign</goal>
                                 </goals>
                                 <configuration>
+                                  <skip>true</skip>
                                   <gpgArguments>
                                     <arg>--pinentry-mode</arg>
                                     <arg>loopback</arg>
@@ -992,7 +993,7 @@
             <properties>
                 <surefire.argLine>
                                   --add-opens java.base/java.security=ALL-UNNAMED
-                                  --add-opens java.base/java.net=ALL-UNNAMED 
+                                  --add-opens java.base/java.net=ALL-UNNAMED
                                   --add-opens java.base/java.lang=ALL-UNNAMED
                                   --add-opens java.base/java.util=ALL-UNNAMED
                                   --add-opens java.naming/javax.naming.spi=ALL-UNNAMED
