@@ -190,6 +190,16 @@ public abstract class AbstractFeatureMojo extends MojoSupport {
                 features.add(f);
                 if (transitive) {
                     addFeaturesDependencies(f.getFeature(), features, featuresMap, true);
+                    for (Conditional conditional : f.getConditional()) {
+                        for (org.apache.karaf.features.Dependency dep : conditional.getDependencies()) {
+                            List<Feature> cfs = getMatchingFeature(featuresMap, dep.getName(), dep.getVersion());
+                            for (Feature cf : cfs) {
+                                features.add(cf);
+                                addFeaturesDependencies(cf.getFeature(), features, featuresMap, transitive);
+                            }
+                        }
+                    }
+
                 }
             }
         }
@@ -202,6 +212,15 @@ public abstract class AbstractFeatureMojo extends MojoSupport {
                 features.add(f);
                 if (transitive) {
                     addFeaturesDependencies(f.getFeature(), features, featuresMap, true);
+                    for (Conditional conditional : f.getConditional()) {
+                        for (org.apache.karaf.features.Dependency dep : conditional.getDependencies()) {
+                            List<Feature> cfs = getMatchingFeature(featuresMap, dep.getName(), dep.getVersion());
+                            for (Feature cf : cfs) {
+                                features.add(cf);
+                                addFeaturesDependencies(cf.getFeature(), features, featuresMap, transitive);
+                            }
+                        }
+                    }
                 }
             }
         }
