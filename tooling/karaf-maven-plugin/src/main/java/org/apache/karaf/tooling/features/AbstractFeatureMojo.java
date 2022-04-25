@@ -30,7 +30,6 @@ import java.util.regex.Pattern;
 import org.apache.felix.utils.version.VersionRange;
 import org.apache.felix.utils.version.VersionTable;
 import org.apache.karaf.features.BundleInfo;
-import org.apache.karaf.features.Conditional;
 import org.apache.karaf.features.internal.model.*;
 import org.apache.karaf.tooling.utils.MojoSupport;
 import org.apache.maven.artifact.Artifact;
@@ -190,15 +189,7 @@ public abstract class AbstractFeatureMojo extends MojoSupport {
                 features.add(f);
                 if (transitive) {
                     addFeaturesDependencies(f.getFeature(), features, featuresMap, true);
-                    for (Conditional conditional : f.getConditional()) {
-                        for (org.apache.karaf.features.Dependency dep : conditional.getDependencies()) {
-                            List<Feature> cfs = getMatchingFeature(featuresMap, dep.getName(), dep.getVersion());
-                            for (Feature cf : cfs) {
-                                features.add(cf);
-                                addFeaturesDependencies(cf.getFeature(), features, featuresMap, transitive);
-                            }
-                        }
-                    }
+                    addFeaturesConditionals(f.getConditional(), features, featuresMap);
 
                 }
             }
@@ -216,15 +207,25 @@ public abstract class AbstractFeatureMojo extends MojoSupport {
                 features.add(f);
                 if (transitive) {
                     addFeaturesDependencies(f.getFeature(), features, featuresMap, true);
-                    for (Conditional conditional : f.getConditional()) {
-                        for (org.apache.karaf.features.Dependency dep : conditional.getDependencies()) {
-                            List<Feature> cfs = getMatchingFeature(featuresMap, dep.getName(), dep.getVersion());
-                            for (Feature cf : cfs) {
-                                features.add(cf);
-                                addFeaturesDependencies(cf.getFeature(), features, featuresMap, transitive);
-                            }
-                        }
-                    }
+                    addFeaturesConditionals(f.getConditional(), features, featuresMap);
+                }
+            }
+        }
+    }
+
+    protected void addFeaturesConditionals(List<Conditional> conditionals, Set<Feature> features, Map<String, Feature> featuresMap) {
+        for (Conditional conditional : conditionals) {
+            for (org.apache.karaf.features.Dependency dep : conditional.getDependencies()) {
+                List<Feature> innerFeatures = getMatchingFeature(featuresMap, dep.getName(), dep.getVersion());
+                if (features.containsAll(innerFeatures)) {
+                    // skip already traversed features
+                    continue;
+                }
+
+                for (Feature f : innerFeatures) {
+                    features.add(f);
+                    addFeaturesDependencies(f.getFeature(), features, featuresMap, true);
+                    addFeaturesConditionals(f.getConditional(), features, featuresMap);
                 }
             }
         }
