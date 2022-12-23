@@ -34,9 +34,9 @@
 
     <properties>
         <appendedResourcesDirectory>${basedir}/../../etc/appended-resources</appendedResourcesDirectory>
-        <mvn.opts />
-        <invoker.skip />
-        <compiler.fork />
+        <mvn.opts/>
+        <invoker.skip/>
+        <compiler.fork/>
         <jacoco-class-line-covered-ratio>0.00</jacoco-class-line-covered-ratio>
         <jacoco-class-instruction-covered-ratio>0.00</jacoco-class-instruction-covered-ratio>
         <jacoco-class-missed-count-maximum>1</jacoco-class-missed-count-maximum>
@@ -101,7 +101,7 @@
             <dependency>
                 <groupId>org.apache.karaf.shell</groupId>
                 <artifactId>org.apache.karaf.shell.console</artifactId>
-                <version>4.2.10</version>
+                <version>4.3.8</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.karaf</groupId>
