@@ -25,7 +25,7 @@
         <groupId>org.apache</groupId>
         <artifactId>apache</artifactId>
         <version>23</version>
-        <relativePath />
+        <relativePath/>
     </parent>
 
     <groupId>org.apache.karaf</groupId>
@@ -213,7 +213,7 @@
         <felix.inventory.version>1.0.6</felix.inventory.version>
         <felix.plugin.version>5.1.1</felix.plugin.version>
         <felix.utils.version>1.11.6</felix.utils.version>
-        <felix.webconsole.version>4.6.0</felix.webconsole.version>
+        <felix.webconsole.version>4.8.8</felix.webconsole.version>
         <felix.webconsole.api.version>3.4.0</felix.webconsole.api.version>
         <felix.memoryusage.webconsole.plugin.version>1.0.10</felix.memoryusage.webconsole.plugin.version>
         <felix.metatype.version>1.2.2</felix.metatype.version>
@@ -333,7 +333,7 @@
         <winsw.version>2.3.0</winsw.version>
 
 
-        <surefire.argLine />
+        <surefire.argLine/>
 
         <!-- Further used maven plugin versions; e.g. in the docs -->
         <plugin.depends.version>1.4.0</plugin.depends.version>
@@ -588,7 +588,7 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <ignore />
+                                        <ignore/>
                                     </action>
                                 </pluginExecution>
                                 <pluginExecution>
@@ -602,7 +602,7 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <ignore />
+                                        <ignore/>
                                     </action>
                                 </pluginExecution>
                                 <pluginExecution>
@@ -615,7 +615,7 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <ignore />
+                                        <ignore/>
                                     </action>
                                 </pluginExecution>
                                 <pluginExecution>
@@ -628,7 +628,7 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <ignore />
+                                        <ignore/>
                                     </action>
                                 </pluginExecution>
                             </pluginExecutions>
