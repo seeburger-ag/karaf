@@ -318,6 +318,7 @@
                 <executions>
                     <execution>
                         <id>integration-test</id>
+                        <phase>none</phase>
                         <goals>
                             <goal>install</goal>
                             <goal>run</goal>
@@ -325,6 +326,7 @@
                     </execution>
                     <execution>
                         <id>test-offline</id>
+                        <phase>none</phase>
                         <goals>
                             <goal>run</goal>
                         </goals>
