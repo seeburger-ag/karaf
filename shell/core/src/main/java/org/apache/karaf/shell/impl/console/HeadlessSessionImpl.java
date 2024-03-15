@@ -27,6 +27,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.felix.service.command.CommandProcessor;
 import org.apache.felix.service.command.CommandSession;
@@ -49,6 +50,8 @@ public class HeadlessSessionImpl implements Session {
     final SessionFactory factory;
     final CommandSession session;
     final Registry registry;
+
+    private final AtomicBoolean closed = new AtomicBoolean(false);
 
     public HeadlessSessionImpl(SessionFactory factory, CommandProcessor processor, InputStream in, PrintStream out, PrintStream err) {
         this(factory, processor, in, out, err, null);
@@ -196,7 +199,10 @@ public class HeadlessSessionImpl implements Session {
 
     @Override
     public void close() {
-        session.close();
+        if (closed.compareAndSet(false, true)) {
+            if (session != null)
+                session.close();
+        }
     }
 
     static class ReadOnlyTerminal implements Terminal {
