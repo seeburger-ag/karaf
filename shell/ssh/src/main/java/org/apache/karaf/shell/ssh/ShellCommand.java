@@ -96,8 +96,10 @@ public class ShellCommand implements Command {
 
     public void run() {
         int exitStatus = 0;
+        Session sessionLocal = null;
         try {
             final Session session = sessionFactory.create(in, new PrintStream(out), new PrintStream(err));
+            sessionLocal = session; // for close in finally
             for (Map.Entry<String,String> e : env.getEnv().entrySet()) {
                 session.put(e.getKey(), e.getValue());
             }
@@ -146,8 +148,8 @@ public class ShellCommand implements Command {
         } finally {
             callback.onExit(exitStatus);
             StreamUtils.close(in, out, err);
-            if (serverSession != null) {
-                serverSession.close(false);
+            if (sessionLocal != null) {
+                sessionLocal.close();
             }
         }
     }
