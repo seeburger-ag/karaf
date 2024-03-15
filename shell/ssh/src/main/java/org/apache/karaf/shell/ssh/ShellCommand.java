@@ -96,10 +96,12 @@ public class ShellCommand implements Command {
 
     public void run() {
         int exitStatus = 0;
+        Session sessionLocal = null;
         try {
-            final Session session = sessionFactory.create(in, new PrintStream(out), new PrintStream(err));
+            final Session sessionLocalFinal = sessionFactory.create(in, new PrintStream(out), new PrintStream(err)); // final for usage in lambda
+            sessionLocal = sessionLocalFinal; // for close in finally
             for (Map.Entry<String,String> e : env.getEnv().entrySet()) {
-                session.put(e.getKey(), e.getValue());
+                sessionLocalFinal.put(e.getKey(), e.getValue());
             }
             try {
                 Subject subject = this.session != null ? this.session.getAttribute(KarafJaasAuthenticator.SUBJECT_ATTRIBUTE_KEY) : null;
@@ -111,8 +113,8 @@ public class ShellCommand implements Command {
                             if (scriptFileName == null) {
                                 scriptFileName = System.getProperty(SHELL_INIT_SCRIPT);
                             }
-                            executeScript(scriptFileName, session);
-                            return session.execute(command);
+                            executeScript(scriptFileName, sessionLocalFinal);
+                            return sessionLocalFinal.execute(command);
                         });
                     } catch (PrivilegedActionException e) {
                         throw e.getException();
@@ -122,8 +124,8 @@ public class ShellCommand implements Command {
                     if (scriptFileName == null) {
                         scriptFileName = System.getProperty(SHELL_INIT_SCRIPT);
                     }
-                    executeScript(scriptFileName, session);
-                    result = session.execute(command);
+                    executeScript(scriptFileName, sessionLocalFinal);
+                    result = sessionLocalFinal.execute(command);
                 }
                 if (result != null)
                 {
@@ -137,7 +139,7 @@ public class ShellCommand implements Command {
                 }
             } catch (Throwable t) {
                 exitStatus = 1;
-                ShellUtil.logException(session, t);
+                ShellUtil.logException(sessionLocalFinal, t);
             }
         } catch (Exception e) {
             exitStatus = 1;
@@ -145,8 +147,8 @@ public class ShellCommand implements Command {
         } finally {
             callback.onExit(exitStatus);
             StreamUtils.close(in, out, err);
-            if (session != null) {
-                session.close(false);
+            if (sessionLocal != null) {
+                sessionLocal.close();
             }
         }
     }
