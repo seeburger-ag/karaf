@@ -16,6 +16,7 @@
  */
 package org.apache.karaf.features.internal.service;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -112,6 +113,8 @@ import static org.osgi.framework.namespace.IdentityNamespace.IDENTITY_NAMESPACE;
 import static org.osgi.framework.namespace.IdentityNamespace.TYPE_BUNDLE;
 
 public class Deployer {
+
+    private static final boolean SEE_BY_REFERENCE = Boolean.getBoolean("org.apache.felix.framework.cache.see.by.reference");
 
     /**
      * Interface through which {@link Deployer} interacts with OSGi framework.
@@ -896,15 +899,26 @@ public class Deployer {
                 String name = entry.getKey();
                 Deployer.RegionDeployment regionDeployment = entry.getValue();
                 for (Resource resource : regionDeployment.toInstall) {
-                    String uri = getUri(resource);
+                    String uri = getUri(resource); // e.g. mvn:com.xxx.group/artifact/1.2.3/jar/classifier
                     print("  " + uri, verbose);
                     Bundle bundle;
                     long crc;
-                    try (
-                            ChecksumUtils.CRCInputStream is = new ChecksumUtils.CRCInputStream(getBundleInputStream(resource, providers))
-                    ) {
-                        bundle = callback.installBundle(name, uri, is);
+                    ChecksumUtils.CRCInputStream is = null;
+                    try  {
+                        StreamProvider streamProvider = getStreamProvider(resource, providers);
+                        File file = streamProvider.getFile();
+                        is = new ChecksumUtils.CRCInputStream(getBundleInputStream(resource, providers));
+
+                        String installUri = uri;
+                        if (SEE_BY_REFERENCE) {
+                            installUri = "reference:file:" + file.getAbsolutePath();
+                        }
+
+                        bundle = callback.installBundle(name, installUri, is);
                         crc = is.getCRC();
+                    }
+                    finally {
+                        if (is != null) is.close();
                     }
                     addToMapSet(managedBundles, name, bundle.getBundleId());
                     deployment.resToBnd.put(resource, bundle);
@@ -1626,16 +1640,24 @@ public class Deployer {
     }
 
     protected InputStream getBundleInputStream(Resource resource, Map<String, StreamProvider> providers) throws IOException {
-        String uri = getUri(resource);
-        if (uri == null) {
-            throw new IllegalStateException("Resource has no uri");
-        }
-        StreamProvider provider = providers.get(uri);
+        StreamProvider provider = getStreamProvider(resource, providers);
         if (provider == null) {
+            String uri = getUri(resource);
+            if (uri == null) {
+                throw new IllegalStateException("Resource has no uri");
+            }
             return new URL(uri).openStream();
 //            throw new IllegalStateException("Resource " + uri + " has no StreamProvider");
         }
         return provider.open();
+    }
+
+    protected StreamProvider getStreamProvider(Resource resource, Map<String, StreamProvider> providers) {
+        String uri = getUri(resource);
+        if (uri == null) {
+            throw new IllegalStateException("Resource has no uri");
+        }
+        return providers.get(uri);
     }
 
     public static void ensureAllClassesLoaded(Bundle bundle) throws ClassNotFoundException {
