@@ -150,8 +150,10 @@
     </developers>
 
     <properties>
-        <project.build.outputTimestamp>1779703860</project.build.outputTimestamp>        
-        <javaVersion>11</javaVersion>
+        <project.build.outputTimestamp>1695310533</project.build.outputTimestamp>
+        <javaVersion>21</javaVersion>
+        <maven.compiler.target>${javaVersion}</maven.compiler.target>
+        <maven.compiler.release>${javaVersion}</maven.compiler.release>
 
         <scm.connection>scm:git:git@github.com:seeburger-ag/karaf.git</scm.connection>
         <scm.developerConnection>scm:git:git@github.com:seeburger-ag/karaf.git</scm.developerConnection>
@@ -260,7 +262,7 @@
         <aries.jndi.api.version>1.1.0</aries.jndi.api.version>
         <aries.jndi.core.version>1.0.2</aries.jndi.core.version>
         <aries.jndi.url.version>1.1.0</aries.jndi.url.version>
-        <aries.proxy.version>1.1.14</aries.proxy.version>
+        <aries.proxy.version>2.0.0</aries.proxy.version>
         <aries.proxy.api.version>1.1.1</aries.proxy.api.version>
         <aries.spifly.version>1.3.8</aries.spifly.version>
         <aries.subsystem.api.version>2.0.10</aries.subsystem.api.version>
@@ -291,7 +293,8 @@
         <maven.version>3.10.0</maven.version>
         <maven.wagon.version>3.5.3</maven.wagon.version>
         <maven-plugin-annotations.version>3.16.0</maven-plugin-annotations.version>
-        <maven.resolver.version>1.8.2</maven.resolver.version>
+        <maven.resolver.version>2.0.24</maven.resolver.version>
+        <objenesis.version>3.6</objenesis.version>
 
         <osgi.version>8.0.0</osgi.version>
         <org.osgi.annotation.bundle.version>1.1.1</org.osgi.annotation.bundle.version>
@@ -451,6 +454,15 @@
 
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <compilerArgs>
+                            <arg>-Xlint:deprecation</arg>
+                        </compilerArgs>
+                    </configuration>
+                </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-eclipse-plugin</artifactId>
@@ -627,7 +639,8 @@
                                     <version>[3.8.8,4)</version>
                                 </requireMavenVersion>
                                 <requireJavaVersion>
-                                    <version>[11,)</version>
+                                    <!-- technical requirement is Subject.current() introduced in JDK18 -->
+                                    <version>[${javaVersion},)</version>
                                 </requireJavaVersion>
                             </rules>
                         </configuration>
@@ -925,7 +938,7 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
                         <configuration>
-                            <source>1.8</source>
+                            <source>${javaVersion}</source>
                         </configuration>
                         <executions>
                             <execution>
@@ -956,7 +969,7 @@
             <properties>
                 <surefire.argLine>
                                   --add-opens java.base/java.security=ALL-UNNAMED
-                                  --add-opens java.base/java.net=ALL-UNNAMED 
+                                  --add-opens java.base/java.net=ALL-UNNAMED
                                   --add-opens java.base/java.lang=ALL-UNNAMED
                                   --add-opens java.base/java.util=ALL-UNNAMED
                                   --add-opens java.naming/javax.naming.spi=ALL-UNNAMED

@@ -68,27 +68,19 @@ public class JtaTest extends BaseTest {
     public void noSpecialFeatures() throws Exception {
         ClassLoader cl = FrameworkUtil.getBundle(this.getClass()).adapt(BundleWiring.class).getClassLoader();
 
-        if (isJDK8OrEarlier()) {
-            // these classes should be boot delegated because they should be part of JDK8, all used ONLY
-            // in com.sun.corba.se.impl.javax.rmi.CORBA.Util.mapSystemException()
-            ensureLoadedFromSystem(cl, "javax.transaction.InvalidTransactionException");
-            ensureLoadedFromSystem(cl, "javax.transaction.TransactionRequiredException");
-            ensureLoadedFromSystem(cl, "javax.transaction.TransactionRolledbackException");
-        } else {
-            // JDK9+ doesn't provide javax.transaction package at all
-            ensureNotFound(cl, "javax.transaction.InvalidTransactionException");
-            ensureNotFound(cl, "javax.transaction.TransactionRequiredException");
-            ensureNotFound(cl, "javax.transaction.TransactionRolledbackException");
-        }
+        // JDK9+ doesn't provide jakarta.transaction package at all
+        ensureNotFound(cl, "jakarta.transaction.InvalidTransactionException");
+        ensureNotFound(cl, "jakarta.transaction.TransactionRequiredException");
+        ensureNotFound(cl, "jakarta.transaction.TransactionRolledbackException");
 
-        // whatever the JDK, these classes should be available
+        // these classes should be available
         ensureLoadedFromSystem(cl, "javax.transaction.xa.XAException");
         ensureLoadedFromSystem(cl, "javax.transaction.xa.XAResource");
         ensureLoadedFromSystem(cl, "javax.transaction.xa.Xid");
 
-        // whatever the JDK, these classes should NOT be available
-        ensureNotFound(cl, "javax.transaction.UserTransaction");
-        ensureNotFound(cl, "javax.transaction.TransactionManager");
+        // these classes should NOT be available
+        ensureNotFound(cl, "jakarta.transaction.UserTransaction");
+        ensureNotFound(cl, "jakarta.transaction.TransactionManager");
     }
 
     @Test
@@ -100,19 +92,12 @@ public class JtaTest extends BaseTest {
         ClassLoader myCl = FrameworkUtil.getBundle(this.getClass()).adapt(BundleWiring.class).getClassLoader();
         ClassLoader jtaCl = FrameworkUtil.getBundle(myCl.loadClass("javax.transaction.UserTransaction")).adapt(BundleWiring.class).getClassLoader();
 
-        if (isJDK8OrEarlier()) {
-            // these classes should be boot delegated
-            ensureLoadedFromSystem(myCl, "javax.transaction.InvalidTransactionException");
-            ensureLoadedFromSystem(myCl, "javax.transaction.TransactionRequiredException");
-            ensureLoadedFromSystem(myCl, "javax.transaction.TransactionRolledbackException");
-        } else {
-            // these classes ARE boot delegated, but can't be found in JDK, so they're loaded from the API bundle
-            ensureLoadedFromCl(myCl, jtaCl, "javax.transaction.InvalidTransactionException");
-            ensureLoadedFromCl(myCl, jtaCl, "javax.transaction.TransactionRequiredException");
-            ensureLoadedFromCl(myCl, jtaCl, "javax.transaction.TransactionRolledbackException");
-        }
+        // these classes are boot delegated, but can't be found in JDK, so they're loaded from the API bundle
+        ensureLoadedFromCl(myCl, jtaCl, "jakarta.transaction.InvalidTransactionException");
+        ensureLoadedFromCl(myCl, jtaCl, "jakarta.transaction.TransactionRequiredException");
+        ensureLoadedFromCl(myCl, jtaCl, "jakarta.transaction.TransactionRolledbackException");
 
-        // whatever the JDK, these classes should be available from system CL, even if javax.transaction-api/1.2
+        // these classes should be available from system CL, even if jakarta.transaction-api/2.0.1
         // exports javax.transaction.xa package
         ensureLoadedFromSystem(myCl, "javax.transaction.xa.XAException");
         ensureLoadedFromSystem(myCl, "javax.transaction.xa.XAResource");
@@ -151,17 +136,9 @@ public class JtaTest extends BaseTest {
         ClassLoader dbcp2Cl = dbcp2.adapt(BundleWiring.class).getClassLoader();
         ClassLoader jtaCl = FrameworkUtil.getBundle(myCl.loadClass("javax.transaction.UserTransaction")).adapt(BundleWiring.class).getClassLoader();
 
-        if (isJDK8OrEarlier()) {
-            // these classes should be boot delegated
-            ensureLoadedFromSystem(myCl, "javax.transaction.InvalidTransactionException");
-            ensureLoadedFromSystem(myCl, "javax.transaction.TransactionRequiredException");
-            ensureLoadedFromSystem(myCl, "javax.transaction.TransactionRolledbackException");
-        } else {
-            // these classes ARE boot delegated, but can't be found in JDK, so they're loaded from the API bundle
-            ensureLoadedFromCl(myCl, jtaCl, "javax.transaction.InvalidTransactionException");
-            ensureLoadedFromCl(myCl, jtaCl, "javax.transaction.TransactionRequiredException");
-            ensureLoadedFromCl(myCl, jtaCl, "javax.transaction.TransactionRolledbackException");
-        }
+        ensureLoadedFromCl(myCl, jtaCl, "jakarta.transaction.InvalidTransactionException");
+        ensureLoadedFromCl(myCl, jtaCl, "jakarta.transaction.TransactionRequiredException");
+        ensureLoadedFromCl(myCl, jtaCl, "jakarta.transaction.TransactionRolledbackException");
 
         // These classes should come from system - whether loaded from my, jta or dbcp2 CL, even if dbcp2 wires
         // directly to system through Import-Package: javax.transaction.xa;partial=true;mandatory:=partial
@@ -209,17 +186,9 @@ public class JtaTest extends BaseTest {
         ClassLoader dbcp2Cl = dbcp2.adapt(BundleWiring.class).getClassLoader();
         ClassLoader jtaCl = FrameworkUtil.getBundle(myCl.loadClass("javax.transaction.UserTransaction")).adapt(BundleWiring.class).getClassLoader();
 
-        if (isJDK8OrEarlier()) {
-            // these classes should be boot delegated
-            ensureLoadedFromSystem(myCl, "javax.transaction.InvalidTransactionException");
-            ensureLoadedFromSystem(myCl, "javax.transaction.TransactionRequiredException");
-            ensureLoadedFromSystem(myCl, "javax.transaction.TransactionRolledbackException");
-        } else {
-            // these classes ARE boot delegated, but can't be found in JDK, so they're loaded from the API bundle
-            ensureLoadedFromCl(myCl, jtaCl, "javax.transaction.InvalidTransactionException");
-            ensureLoadedFromCl(myCl, jtaCl, "javax.transaction.TransactionRequiredException");
-            ensureLoadedFromCl(myCl, jtaCl, "javax.transaction.TransactionRolledbackException");
-        }
+        ensureLoadedFromCl(myCl, jtaCl, "jakarta.transaction.InvalidTransactionException");
+        ensureLoadedFromCl(myCl, jtaCl, "jakarta.transaction.TransactionRequiredException");
+        ensureLoadedFromCl(myCl, jtaCl, "jakarta.transaction.TransactionRolledbackException");
 
         ensureLoadedFromSystem(jtaCl, "javax.transaction.xa.Xid");
         ensureLoadedFromSystem(myCl, "javax.transaction.xa.Xid");
@@ -256,21 +225,6 @@ public class JtaTest extends BaseTest {
             Class<?> c = cl.loadClass(className);
             fail("Class " + className + " should not be available");
         } catch (ClassNotFoundException ignored) {
-        }
-    }
-
-    private boolean isJDK8OrEarlier() {
-        String v = System.getProperty("java.specification.version");
-        try {
-            if (v.contains(".")) {
-                float f = Float.parseFloat(v);
-                return f < 1.9F;
-            } else {
-                int i = Integer.parseInt(v);
-                return i < 9;
-            }
-        } catch (NumberFormatException ignored) {
-            return true;
         }
     }
 
