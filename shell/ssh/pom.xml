@@ -97,7 +97,7 @@
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk18on</artifactId>
             <scope>compile</scope>
-            <version>${bouncycastle.version}</version>
+            <version>${bouncycastle.bcprov.jdk18on.version}</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
