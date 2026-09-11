@@ -150,7 +150,7 @@
     </developers>
 
     <properties>
-        <project.build.outputTimestamp>1795005262</project.build.outputTimestamp>        
+        <project.build.outputTimestamp>1795005262</project.build.outputTimestamp>
         <javaVersion>11</javaVersion>
 
         <scm.connection>scm:git:git@github.com:seeburger-ag/karaf.git</scm.connection>
@@ -202,7 +202,7 @@
         <easymock.version>5.7.0</easymock.version>
         <equinox.groupId>org.eclipse.platform</equinox.groupId>
         <equinox.artifactId>org.eclipse.osgi</equinox.artifactId>
-        <equinox.version>3.18.600</equinox.version>
+        <equinox.version>3.24.300</equinox.version>
         <equinox.region.version>1.5.800</equinox.region.version>
         <equinox.coordinator.version>1.5.500</equinox.coordinator.version>
 
@@ -956,7 +956,7 @@
             <properties>
                 <surefire.argLine>
                                   --add-opens java.base/java.security=ALL-UNNAMED
-                                  --add-opens java.base/java.net=ALL-UNNAMED 
+                                  --add-opens java.base/java.net=ALL-UNNAMED
                                   --add-opens java.base/java.lang=ALL-UNNAMED
                                   --add-opens java.base/java.util=ALL-UNNAMED
                                   --add-opens java.naming/javax.naming.spi=ALL-UNNAMED
