@@ -31,7 +31,7 @@
     <groupId>org.apache.karaf</groupId>
     <artifactId>karaf</artifactId>
     <packaging>pom</packaging>
-    <version>4.4.12-SNAPSHOT</version>
+    <version>4.4.12.SEE2-java-21-SNAPSHOT</version>
     <name>Apache Karaf</name>
     <inceptionYear>2007</inceptionYear>
 
@@ -150,7 +150,7 @@
     </developers>
 
     <properties>
-        <project.build.outputTimestamp>1695310533</project.build.outputTimestamp>
+        <project.build.outputTimestamp>1792132511</project.build.outputTimestamp>
         <javaVersion>21</javaVersion>
         <maven.compiler.target>${javaVersion}</maven.compiler.target>
         <maven.compiler.release>${javaVersion}</maven.compiler.release>
