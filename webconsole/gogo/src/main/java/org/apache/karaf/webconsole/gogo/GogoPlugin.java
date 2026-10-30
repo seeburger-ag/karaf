@@ -216,7 +216,7 @@ public class GogoPlugin extends AbstractWebConsolePlugin {
         
         private String getCurrentUserName() {
             final Subject subject = Subject.current();
-            if (subject != null && subject.getPrincipals().iterator().hasNext()) {
+            if (subject != null && subject.getPrincipals(UserPrincipal.class).iterator().hasNext()) {
                 return subject.getPrincipals(UserPrincipal.class).iterator().next().getName();
             } else {
                 return null;
