@@ -24,6 +24,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
 import java.util.Map;
@@ -50,12 +51,6 @@ public class ShellCommand implements Command {
     public static final String EXEC_INIT_SCRIPT = "karaf.exec.init.script";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ShellCommand.class);
-
-    private static final Class[] SECURITY_BUGFIX = {
-                    JaasHelper.class,
-                    JaasHelper.OsgiSubjectDomainCombiner.class,
-                    JaasHelper.DelegatingProtectionDomain.class,
-            };
 
     private String command;
     private InputStream in;
@@ -101,17 +96,18 @@ public class ShellCommand implements Command {
         int exitStatus = 0;
         Session sessionLocal = null;
         try {
-            final Session session = sessionFactory.create(in, new PrintStream(out, true), new PrintStream(err, true));
+            Subject subject = this.serverSession != null ? this.serverSession.getAttribute(KarafJaasAuthenticator.SUBJECT_ATTRIBUTE_KEY) : null;
+            // create the session as the user, so it keeps that subject for its commands
+            final Session session = JaasHelper.doAs(subject, (PrivilegedAction<Session>) () ->
+                            sessionFactory.create(in, new PrintStream(out, true), new PrintStream(err, true)));
             this.session = session;
             sessionLocal = session; // for close in finally
             for (Map.Entry<String,String> e : env.getEnv().entrySet()) {
                 session.put(e.getKey(), e.getValue());
             }
             try {
-                Subject subject = this.serverSession != null ? this.serverSession.getAttribute(KarafJaasAuthenticator.SUBJECT_ATTRIBUTE_KEY) : null;
                 Object result;
                 if (subject != null) {
-                    session.put(Subject.class.getName(), subject);
                     try {
                         result = JaasHelper.doAs(subject, (PrivilegedExceptionAction<Object>) () -> {
                             String scriptFileName = System.getProperty(EXEC_INIT_SCRIPT);

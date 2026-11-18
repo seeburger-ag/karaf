@@ -31,6 +31,9 @@ import java.io.FileWriter;
 @Mojo(name = "dockerfile", defaultPhase = LifecyclePhase.PACKAGE)
 public class DockerfileMojo extends MojoSupport {
 
+    private static final String DEFAULT_IMAGE = "eclipse-temurin:21-jre";
+    private static final String DEFAULT_COMMAND = "[\"karaf\", \"run\"]";
+
     @Parameter(defaultValue = "${project.build.directory}")
     private File destDir;
 

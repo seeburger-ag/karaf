@@ -96,6 +96,9 @@
                         <goals>
                             <goal>dockerfile</goal>
                         </goals>
+                        <configuration>
+                            <image>eclipse-temurin:21-jre</image>
+                        </configuration>
                     </execution>
                 </executions>
                 <configuration>
@@ -108,7 +111,7 @@
                     <framework>static</framework>
                     <useReferenceUrls>true</useReferenceUrls>
                     <environment>static</environment>
-                    <javase>11</javase>
+                    <javase>${javaVersion}</javase>
                 </configuration>
             </plugin>
         </plugins>

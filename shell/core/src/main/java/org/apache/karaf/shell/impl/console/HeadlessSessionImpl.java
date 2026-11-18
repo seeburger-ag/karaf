@@ -29,6 +29,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.security.auth.Subject;
+
 import org.apache.felix.service.command.CommandProcessor;
 import org.apache.felix.service.command.CommandSession;
 import org.apache.karaf.shell.api.console.Command;
@@ -50,6 +52,8 @@ public class HeadlessSessionImpl implements Session {
     final SessionFactory factory;
     final CommandSession session;
     final Registry registry;
+    // Subject the commands run as, see SessionFactoryImpl.getSubject()
+    volatile Subject subject;
 
     private final AtomicBoolean closed = new AtomicBoolean(false);
 
@@ -95,6 +99,14 @@ public class HeadlessSessionImpl implements Session {
         }
         session.put(".processor", processor);
         session.put(".session", this);
+        if (factory instanceof SessionFactoryImpl) {
+            ((SessionFactoryImpl) factory).register(session, this);
+        }
+        // a child session runs as its parent; on JDK 21 Subject.current() may be a stale inherited one
+        subject = SessionFactoryImpl.getSubject(parent);
+        if (subject == null) {
+            subject = Subject.current();
+        }
         session.put(".commandSession", session);
         if (parent == null) {
             session.put(Session.SCOPE, "shell:bundle:*");
@@ -113,7 +125,18 @@ public class HeadlessSessionImpl implements Session {
     @Override
     public Object execute(CharSequence commandline) throws Exception {
         String command = CommandLineParser.parse(this, commandline.toString());
-        return session.execute(command);
+        // A caller running as another subject (jaas:sudo, ssh exec, ...) switches it for this call
+        Subject current = Subject.current();
+        if (current == null || current == subject) {
+            return session.execute(command);
+        }
+        Subject previous = subject;
+        subject = current;
+        try {
+            return session.execute(command);
+        } finally {
+            subject = previous;
+        }
     }
 
     @Override
